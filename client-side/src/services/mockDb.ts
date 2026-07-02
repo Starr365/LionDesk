@@ -5,6 +5,7 @@ export interface User {
   role: 'student' | 'staff' | 'admin';
   matricNo?: string;
   category?: string; // For staff members
+  isActive?: boolean; // For deactivation status
 }
 
 export interface Comment {
@@ -50,12 +51,12 @@ export const STUDENT_REGISTRY = [
 
 // Initial mock database state in memory
 let users: User[] = [
-  { id: 'usr-1', name: 'Chidi Egwu', email: 'chidi.egwu.student@unn.edu.ng', role: 'student', matricNo: '2021/240123' },
-  { id: 'usr-2', name: 'Stella Starr', email: 'stella.starr.student@unn.edu.ng', role: 'student', matricNo: '2022/240456' },
-  { id: 'usr-3', name: 'Dr. Charles Uzo', email: 'charles.uzo.staff@unn.edu.ng', role: 'staff', category: 'Academic' },
-  { id: 'usr-4', name: 'Mrs. Ngozi Alao', email: 'ngozi.alao.staff@unn.edu.ng', role: 'staff', category: 'Portal' },
-  { id: 'usr-5', name: 'Engr. Frank Eke', email: 'frank.eke.staff@unn.edu.ng', role: 'staff', category: 'Facility' },
-  { id: 'usr-6', name: 'Prof. Augustine HOD', email: 'hod.cs@unn.edu.ng', role: 'admin' }
+  { id: 'usr-1', name: 'Chidi Egwu', email: 'chidi.egwu.student@unn.edu.ng', role: 'student', matricNo: '2021/240123', isActive: true },
+  { id: 'usr-2', name: 'Stella Starr', email: 'stella.starr.student@unn.edu.ng', role: 'student', matricNo: '2022/240456', isActive: true },
+  { id: 'usr-3', name: 'Dr. Charles Uzo', email: 'charles.uzo.staff@unn.edu.ng', role: 'staff', category: 'Academic', isActive: true },
+  { id: 'usr-4', name: 'Mrs. Ngozi Alao', email: 'ngozi.alao.staff@unn.edu.ng', role: 'staff', category: 'Portal', isActive: true },
+  { id: 'usr-5', name: 'Engr. Frank Eke', email: 'frank.eke.staff@unn.edu.ng', role: 'staff', category: 'Facility', isActive: true },
+  { id: 'usr-6', name: 'Prof. Augustine HOD', email: 'hod.cs@unn.edu.ng', role: 'admin', isActive: true }
 ];
 
 let categories: Category[] = [
@@ -270,10 +271,35 @@ export const mockDb = {
       name: fullName,
       email,
       role: 'student',
-      matricNo
+      matricNo,
+      isActive: true
     };
     users.push(newUser);
     broadcastDbChange();
     return newUser;
+  },
+
+  addStaff: (data: { name: string; email: string; category: string }) => {
+    const newStaff: User = {
+      id: `usr-${Date.now()}`,
+      name: data.name,
+      email: data.email,
+      role: 'staff',
+      category: data.category,
+      isActive: true
+    };
+    users.push(newStaff);
+    broadcastDbChange();
+    return newStaff;
+  },
+
+  toggleUserActive: (id: string) => {
+    users = users.map((u) => {
+      if (u.id === id) {
+        return { ...u, isActive: !u.isActive };
+      }
+      return u;
+    });
+    broadcastDbChange();
   }
 };

@@ -27,6 +27,13 @@ export const AdminDashboard: React.FC = () => {
   // Reassignment state
   const [selectedStaffId, setSelectedStaffId] = useState('');
 
+  // Add Staff state
+  const [staffName, setStaffName] = useState('');
+  const [staffEmail, setStaffEmail] = useState('');
+  const [staffCategory, setStaffCategory] = useState('');
+  const [staffModalOpen, setStaffModalOpen] = useState(false);
+  const [staffError, setStaffError] = useState('');
+
   const loadData = () => {
     setTickets(mockDb.getTickets());
     setCategories(mockDb.getCategories());
@@ -73,6 +80,31 @@ export const AdminDashboard: React.FC = () => {
     setSelectedStaffId('');
     setDetailModalOpen(false);
     setSelectedTicket(null);
+  };
+
+  const handleCreateStaff = (e: React.FormEvent) => {
+    e.preventDefault();
+    setStaffError('');
+
+    if (!staffName.trim() || !staffEmail.trim() || !staffCategory) {
+      setStaffError('All fields are mandatory.');
+      return;
+    }
+
+    mockDb.addStaff({
+      name: staffName,
+      email: staffEmail,
+      category: staffCategory
+    });
+
+    setStaffName('');
+    setStaffEmail('');
+    setStaffCategory('');
+    setStaffModalOpen(false);
+  };
+
+  const handleToggleStaffActive = (id: string) => {
+    mockDb.toggleUserActive(id);
   };
 
   // Stats derivations
@@ -182,7 +214,15 @@ export const AdminDashboard: React.FC = () => {
         {/* Tab 2: Manage Staff Specialist */}
         {activeTab === 'staff' && (
           <div className="space-y-4">
-            <h2 className="text-xl font-extrabold text-brand-text-main font-sans">Staff Workload Specializations</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-extrabold text-brand-text-main font-sans">Staff Workload Specializations</h2>
+              <button
+                onClick={() => setStaffModalOpen(true)}
+                className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold py-2.5 px-4 rounded-xl transition"
+              >
+                + Add Staff Specialist
+              </button>
+            </div>
             <div className="bg-brand-card border border-brand-border/40 rounded-2xl overflow-hidden shadow-xs">
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -191,6 +231,8 @@ export const AdminDashboard: React.FC = () => {
                     <th className="py-4 px-6">Specialty Category</th>
                     <th className="py-4 px-6">Email Address</th>
                     <th className="py-4 px-6">Active Handled Workloads</th>
+                    <th className="py-4 px-6">Status</th>
+                    <th className="py-4 px-6 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-brand-border/20 text-sm font-semibold text-brand-text-main">
@@ -209,6 +251,25 @@ export const AdminDashboard: React.FC = () => {
                         <td className="py-4 px-6 text-brand-text-muted">{s.email}</td>
                         <td className="py-4 px-6">
                           <span className="font-extrabold text-brand-primary">{activeW} active tickets</span>
+                        </td>
+                        <td className="py-4 px-6">
+                          {s.isActive === false ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-silver/20 text-brand-text-muted border border-brand-border/30">
+                              Inactive
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-secondary/10 text-brand-secondary border border-brand-secondary/20">
+                              Active
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6 text-right">
+                          <button
+                            onClick={() => handleToggleStaffActive(s.id)}
+                            className="bg-transparent border border-brand-primary hover:bg-brand-primary hover:text-brand-white text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg transition"
+                          >
+                            {s.isActive === false ? 'Activate' : 'Deactivate'}
+                          </button>
                         </td>
                       </tr>
                     );
@@ -524,6 +585,88 @@ export const AdminDashboard: React.FC = () => {
                 </button>
               </form>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Create Staff Specialist Modal Overlay */}
+      {staffModalOpen && (
+        <div className="fixed inset-0 bg-brand-primary/15 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-brand-card border border-brand-border/40 w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-lg font-extrabold text-brand-text-main">Add Staff Specialist</h3>
+                <p className="text-[10px] text-brand-text-muted font-bold">Register a new specialist to handle category assignments.</p>
+              </div>
+              <button
+                onClick={() => setStaffModalOpen(false)}
+                className="text-brand-text-muted hover:text-brand-primary font-bold text-lg"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateStaff} className="space-y-4">
+              {staffError && (
+                <div className="p-3 bg-brand-primary/5 border border-brand-primary text-brand-primary text-xs font-bold rounded-lg">
+                  {staffError}
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">Specialist Name</label>
+                <input
+                  type="text"
+                  required
+                  value={staffName}
+                  onChange={(e) => setStaffName(e.target.value)}
+                  placeholder="e.g. Dr. Jane Doe"
+                  className="w-full bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-2.5 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={staffEmail}
+                  onChange={(e) => setStaffEmail(e.target.value)}
+                  placeholder="e.g. jane.doe@unn.edu.ng"
+                  className="w-full bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-2.5 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">Specialty Category</label>
+                <select
+                  required
+                  value={staffCategory}
+                  onChange={(e) => setStaffCategory(e.target.value)}
+                  className="w-full bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-2.5 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
+                >
+                  <option value="">-- Choose Category --</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex gap-4 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setStaffModalOpen(false)}
+                  className="w-1/2 border border-brand-border hover:border-brand-primary text-brand-text-muted hover:text-brand-primary font-bold py-2.5 px-4 rounded-xl transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="w-1/2 bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-2.5 px-4 rounded-xl shadow-xs transition"
+                >
+                  Add Specialist
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
