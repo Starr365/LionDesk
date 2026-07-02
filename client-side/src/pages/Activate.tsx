@@ -12,7 +12,7 @@ const Activate: React.FC = () => {
     e.preventDefault();
     console.log('Activation details:', { matricNumber, fullName, email, password });
     // Demo redirects on success
-    navigate('/student/dashboard');
+    navigate('/student');
   };
 
   return (
@@ -57,8 +57,8 @@ const Activate: React.FC = () => {
       </header>
 
       {/* Main card */}
-      <main className="flex-grow flex items-center justify-center py-10 z-10">
-        <div className="bg-brand-card border border-brand-border/40 w-full max-w-md rounded-3xl p-8 sm:p-10 shadow-xl space-y-6">
+      <main className="grow flex items-center justify-center py-10 z-10">
+        <div className="bg-brand-card border border-brand-border/40 w-full max-w-md rounded-3xl p-6 sm:p-10 shadow-xl space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-text-main">
               Student Activation

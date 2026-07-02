@@ -22,7 +22,7 @@ export const Security: React.FC = () => {
           {/* Right Graphic Column */}
           <div className="lg:col-span-6 flex justify-center">
             <div className="relative group rounded-2xl overflow-hidden bg-brand-card border border-brand-border/40 p-1.5 shadow-xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/5 to-brand-secondary/5 opacity-70 group-hover:opacity-100 transition duration-300 pointer-events-none rounded-2xl" />
+              <div className="absolute inset-0 bg-linear-to-br from-brand-primary/5 to-brand-secondary/5 opacity-70 group-hover:opacity-100 transition duration-300 pointer-events-none rounded-2xl" />
               <img
                 src={securityCluster}
                 alt="Security &amp; Data Integrity Mockup Icons"

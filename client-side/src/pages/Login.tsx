@@ -10,13 +10,13 @@ const Login: React.FC = () => {
     e.preventDefault();
     // Simple demo validation logic
     if (email.includes('student')) {
-      navigate('/student/dashboard');
+      navigate('/student');
     } else if (email.includes('staff')) {
-      navigate('/staff/dashboard');
+      navigate('/staff');
     } else if (email.includes('admin') || email.includes('hod')) {
-      navigate('/admin/dashboard');
+      navigate('/admin');
     } else {
-      navigate('/student/dashboard');
+      navigate('/student');
     }
   };
 
@@ -68,8 +68,8 @@ const Login: React.FC = () => {
       </header>
 
       {/* Main card */}
-      <main className="flex-grow flex items-center justify-center py-10 z-10">
-        <div className="bg-brand-card border border-brand-border/40 w-full max-w-md rounded-3xl p-8 sm:p-10 shadow-xl space-y-6">
+      <main className="grow flex items-center justify-center py-10 z-10">
+        <div className="bg-brand-card border border-brand-border/40 w-full max-w-md rounded-3xl p-6 sm:p-10 shadow-xl space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-text-main">
               Portal Login
