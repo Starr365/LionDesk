@@ -6,15 +6,13 @@ import { TicketTable } from '../components/shared/TicketTable';
 import { FiHome, FiClock, FiCheckCircle, FiFileText } from 'react-icons/fi';
 
 export const StudentDashboard: React.FC = () => {
-  // Use Stella Starr as the active student user
   const currentUser = { id: 'usr-2', name: 'Stella Starr', role: 'student' as const };
   
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
   
-  // Modals state
-  const [submitModalOpen, setSubmitModalOpen] = useState(false);
+  // Detail Modal state
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   
@@ -34,13 +32,12 @@ export const StudentDashboard: React.FC = () => {
   // New Comment state
   const [commentText, setCommentText] = useState('');
 
-  // Load and subscribe to database updates
+  // Load database state
   const loadData = () => {
     const studentTickets = mockDb.getTickets().filter((t) => t.studentId === currentUser.id);
     setTickets(studentTickets);
     setCategories(mockDb.getCategories());
     
-    // Update selected ticket details if open
     if (selectedTicket) {
       const updated = mockDb.getTicketById(selectedTicket.id);
       if (updated) {
@@ -76,11 +73,11 @@ export const StudentDashboard: React.FC = () => {
       studentName: currentUser.name
     });
 
-    // Reset Form
+    // Reset Form & Switch Tab to history to see the new ticket
     setNewTitle('');
     setNewCategory('');
     setNewDescription('');
-    setSubmitModalOpen(false);
+    setActiveTab('history');
   };
 
   const handleAddComment = (e: React.FormEvent) => {
@@ -129,12 +126,25 @@ export const StudentDashboard: React.FC = () => {
   ).length;
   const resolvedTickets = tickets.filter((t) => t.status === 'resolved' || t.status === 'closed').length;
 
+  // Sidebar items
   const sidebarTabs = [
     {
       id: 'overview',
-      name: 'Dashboard Overview',
-      icon: <FiHome className="h-5 w-5" />,
+      name: 'Overview',
+      icon: <FiHome className="h-4 w-4" />,
       onClick: () => setActiveTab('overview')
+    },
+    {
+      id: 'submit',
+      name: 'File Complaint',
+      icon: <FiFileText className="h-4 w-4" />,
+      onClick: () => setActiveTab('submit')
+    },
+    {
+      id: 'history',
+      name: 'My History',
+      icon: <FiClock className="h-4 w-4" />,
+      onClick: () => setActiveTab('history')
     }
   ];
 
@@ -145,161 +155,174 @@ export const StudentDashboard: React.FC = () => {
       activeTab={activeTab}
       tabs={sidebarTabs}
     >
-      {/* Top Welcome Title */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-text-main">
-            Welcome back, Stella!
-          </h1>
-          <p className="text-brand-text-muted text-sm font-semibold">
-            Track your departmental help requests or launch a new query.
-          </p>
-        </div>
-        <button
-          onClick={() => setSubmitModalOpen(true)}
-          className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-sm font-bold py-3 px-5 rounded-xl shadow-md transition shrink-0"
-        >
-          + Submit New Complaint
-        </button>
-      </div>
-
-      {/* Stats row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <StatCard
-          title="Tickets Currently Opened"
-          value={activeTickets}
-          description="In Queue or handling by staff"
-          icon={<FiClock className="h-6 w-6" />}
-        />
-        <StatCard
-          title="Resolved complaints"
-          value={resolvedTickets}
-          description="Awaiting feedback or closed"
-          icon={<FiCheckCircle className="h-6 w-6" />}
-        />
-        <StatCard
-          title="Total tickets filed"
-          value={totalSubmitted}
-          description="All-time profile metrics"
-          icon={<FiFileText className="h-6 w-6" />}
-        />
-      </div>
-
-      {/* Main complaint list card */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-extrabold text-brand-text-main">My Ticket History</h2>
-        <TicketTable
-          tickets={tickets}
-          onViewDetails={(ticket) => {
-            setSelectedTicket(ticket);
-            setDetailModalOpen(true);
-          }}
-          showSubmitter={false}
-        />
-      </div>
-
-      {/* Modal 1: Submit New Complaint */}
-      {submitModalOpen && (
-        <div className="fixed inset-0 bg-brand-primary/15 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-brand-card border border-brand-border/40 w-full max-w-lg rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-xl font-extrabold text-brand-text-main">File a Complaint</h3>
-                <p className="text-xs text-brand-text-muted font-semibold">Your ticket will be auto-routed to the correct division staff.</p>
-              </div>
-              <button
-                onClick={() => setSubmitModalOpen(false)}
-                className="text-brand-text-muted hover:text-brand-primary font-bold text-lg"
-              >
-                &times;
-              </button>
+      {/* Tab 1: Overview */}
+      {activeTab === 'overview' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Welcome Banner */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-extrabold text-brand-text-main font-sans">
+                Welcome back, Stella Starr
+              </h1>
+              <p className="text-brand-text-muted text-xs font-semibold">
+                Track your student complaints or log a new assistance ticket.
+              </p>
             </div>
+            <button
+              onClick={() => setActiveTab('submit')}
+              className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-xs transition"
+            >
+              File New Complaint
+            </button>
+          </div>
 
-            <form onSubmit={handleCreateTicket} className="space-y-4">
-              {submitError && (
-                <div className="p-3 bg-brand-primary/5 border border-brand-primary text-brand-primary text-xs font-bold rounded-lg">
-                  {submitError}
-                </div>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <StatCard
+              title="Open complaints"
+              value={activeTickets}
+              description="Assigned and under review"
+              icon={<FiClock className="h-5 w-5" />}
+            />
+            <StatCard
+              title="Resolved"
+              value={resolvedTickets}
+              description="Awaiting feedback or closed"
+              icon={<FiCheckCircle className="h-5 w-5" />}
+            />
+            <StatCard
+              title="Total complaints"
+              value={totalSubmitted}
+              description="Lifetime dashboard metrics"
+              icon={<FiFileText className="h-5 w-5" />}
+            />
+          </div>
+
+          {/* Recent Tickets preview list */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-extrabold text-brand-text-main">Recent Complaints</h2>
+              {tickets.length > 3 && (
+                <button
+                  onClick={() => setActiveTab('history')}
+                  className="text-xs font-bold text-brand-primary hover:text-brand-primary-hover transition"
+                >
+                  View All &rarr;
+                </button>
               )}
-
-              <div className="space-y-1">
-                <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">Complaint Category</label>
-                <select
-                  required
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  className="w-full bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
-                >
-                  <option value="">-- Choose Category --</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.name}>{cat.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">Subject Title</label>
-                <input
-                  type="text"
-                  required
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="e.g. Missing grades in COS 301"
-                  className="w-full bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-semibold transition"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex justify-between items-center">
-                  <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">Elaborate Description</label>
-                  <span className={`text-[10px] font-bold ${newDescription.length < 20 || newDescription.length > 2000 ? 'text-brand-primary' : 'text-brand-text-muted'}`}>
-                    {newDescription.length} / 2000 chars
-                  </span>
-                </div>
-                <textarea
-                  required
-                  value={newDescription}
-                  onChange={(e) => setNewDescription(e.target.value)}
-                  rows={4}
-                  placeholder="Describe your issue. Minimum 20 characters, maximum 2000 characters."
-                  className="w-full bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-semibold transition"
-                />
-              </div>
-
-              <div className="flex gap-4 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setSubmitModalOpen(false)}
-                  className="w-1/2 border border-brand-border hover:border-brand-primary text-brand-text-muted hover:text-brand-primary font-bold py-3 px-4 rounded-xl transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="w-1/2 bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3 px-4 rounded-xl shadow-md transition"
-                >
-                  Submit Ticket
-                </button>
-              </div>
-            </form>
+            </div>
+            <TicketTable
+              tickets={tickets.slice(0, 3)}
+              onViewDetails={(ticket) => {
+                setSelectedTicket(ticket);
+                setDetailModalOpen(true);
+              }}
+              showSubmitter={false}
+            />
           </div>
         </div>
       )}
 
-      {/* Modal 2: Ticket Detail View / Dialog */}
+      {/* Tab 2: File Complaint Inline Panel */}
+      {activeTab === 'submit' && (
+        <div className="max-w-2xl bg-brand-card border border-brand-border/40 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-fade-in">
+          <div>
+            <h2 className="text-xl font-extrabold text-brand-text-main font-sans">File a Departmental Complaint</h2>
+            <p className="text-xs text-brand-text-muted font-semibold mt-1">
+              Your inquiry will be auto-routed to the workload specialist matching your category choice.
+            </p>
+          </div>
+
+          <form onSubmit={handleCreateTicket} className="space-y-4">
+            {submitError && (
+              <div className="p-3 bg-brand-primary/5 border border-brand-primary text-brand-primary text-xs font-bold rounded-lg">
+                {submitError}
+              </div>
+            )}
+
+            <div className="space-y-1">
+              <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">Complaint Category</label>
+              <select
+                required
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                className="w-full bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-3 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
+              >
+                <option value="">-- Choose Category --</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.name}>{cat.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">Subject Title</label>
+              <input
+                type="text"
+                required
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                placeholder="e.g. Missing grades in COS 301 first semester"
+                className="w-full bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-3 text-xs text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-semibold transition"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">Elaborate Description</label>
+                <span className={`text-[10px] font-bold ${newDescription.length < 20 || newDescription.length > 2000 ? 'text-brand-primary' : 'text-brand-text-muted'}`}>
+                  {newDescription.length} / 2000 chars
+                </span>
+              </div>
+              <textarea
+                required
+                value={newDescription}
+                onChange={(e) => setNewDescription(e.target.value)}
+                rows={5}
+                placeholder="Describe your issue. Minimum 20 characters, maximum 2000 characters."
+                className="w-full bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-3 text-xs text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-semibold transition"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-xs transition"
+            >
+              Submit Ticket
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Tab 3: My History List */}
+      {activeTab === 'history' && (
+        <div className="space-y-4 animate-fade-in">
+          <h2 className="text-xl font-extrabold text-brand-text-main font-sans">Full Ticketing History</h2>
+          <TicketTable
+            tickets={tickets}
+            onViewDetails={(ticket) => {
+              setSelectedTicket(ticket);
+              setDetailModalOpen(true);
+            }}
+            showSubmitter={false}
+          />
+        </div>
+      )}
+
+      {/* Detail Dialog Modal (Kept for overlays details) */}
       {detailModalOpen && selectedTicket && (
         <div className="fixed inset-0 bg-brand-primary/15 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-brand-card border border-brand-border/40 w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
+            {/* Header */}
             <div className="flex justify-between items-start border-b border-brand-border/30 pb-4">
               <div>
-                <span className="text-xs font-bold bg-brand-silver/10 px-2 py-1 rounded text-brand-text-muted uppercase">
+                <span className="text-[10px] font-extrabold bg-brand-silver/10 px-2 py-0.5 rounded text-brand-text-muted uppercase">
                   {selectedTicket.category}
                 </span>
-                <h3 className="text-xl font-extrabold text-brand-text-main mt-2">
+                <h3 className="text-lg font-extrabold text-brand-text-main mt-2">
                   {selectedTicket.id}: {selectedTicket.title}
                 </h3>
-                <p className="text-[10px] text-brand-text-muted font-semibold mt-1">
+                <p className="text-[10px] text-brand-text-muted font-bold mt-1">
                   Submitted: {new Date(selectedTicket.date).toLocaleString()}
                 </p>
               </div>
@@ -314,31 +337,31 @@ export const StudentDashboard: React.FC = () => {
               </button>
             </div>
 
-            {/* Description Block */}
+            {/* Description */}
             <div className="space-y-2">
               <h4 className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Detailed Description</h4>
-              <p className="text-sm bg-brand-bg/50 border border-brand-border/20 p-4 rounded-xl leading-relaxed text-brand-text-main font-medium">
+              <p className="text-xs bg-brand-bg/50 border border-brand-border/20 p-4 rounded-xl leading-relaxed text-brand-text-main font-semibold">
                 {selectedTicket.description}
               </p>
             </div>
 
-            {/* Resolution Note if resolved */}
+            {/* Resolution */}
             {selectedTicket.resolutionNote && (
-              <div className="space-y-2 bg-brand-primary/5 border border-brand-primary/40 p-4 rounded-xl">
-                <h4 className="text-xs font-bold text-brand-primary uppercase tracking-wider">Official Resolution Note</h4>
-                <p className="text-sm text-brand-text-main font-semibold leading-relaxed">
+              <div className="space-y-2 bg-brand-primary/5 border border-brand-primary/30 p-4 rounded-xl">
+                <h4 className="text-xs font-bold text-brand-primary uppercase tracking-wider">Resolution note</h4>
+                <p className="text-xs text-brand-text-main font-bold leading-relaxed">
                   {selectedTicket.resolutionNote}
                 </p>
               </div>
             )}
 
-            {/* Discussion / Comments Section */}
+            {/* Comment logs */}
             <div className="space-y-4 pt-2">
-              <h4 className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Workflow log &amp; Comments</h4>
+              <h4 className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Log &amp; Comment Threads</h4>
               
               <div className="space-y-3 max-h-48 overflow-y-auto pr-2 border-b border-brand-border/25 pb-4">
                 {selectedTicket.comments.length === 0 ? (
-                  <p className="text-xs italic text-brand-text-muted/60">No comments posted yet.</p>
+                  <p className="text-xs italic text-brand-text-muted/50">No logs posted yet.</p>
                 ) : (
                   selectedTicket.comments.map((c) => (
                     <div key={c.id} className="p-3 bg-brand-bg/30 border border-brand-border/20 rounded-xl space-y-1">
@@ -346,7 +369,7 @@ export const StudentDashboard: React.FC = () => {
                         <span className="font-extrabold text-brand-primary uppercase">
                           {c.authorName} ({c.authorRole})
                         </span>
-                        <span className="text-brand-text-muted font-semibold">
+                        <span className="text-brand-text-muted font-bold">
                           {new Date(c.date).toLocaleTimeString()}
                         </span>
                       </div>
@@ -356,7 +379,6 @@ export const StudentDashboard: React.FC = () => {
                 )}
               </div>
 
-              {/* Only allow comments if ticket is not closed */}
               {selectedTicket.status !== 'closed' && selectedTicket.status !== 'resolved' && (
                 <form onSubmit={handleAddComment} className="flex gap-2">
                   <input
@@ -364,12 +386,12 @@ export const StudentDashboard: React.FC = () => {
                     required
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    placeholder="Ask for update or reply to staff..."
-                    className="flex-1 bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-2.5 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
+                    placeholder="Add comments or reply to specialist..."
+                    className="flex-1 bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-2 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
                   />
                   <button
                     type="submit"
-                    className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-xs"
+                    className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs"
                   >
                     Send
                   </button>
@@ -377,48 +399,48 @@ export const StudentDashboard: React.FC = () => {
               )}
             </div>
 
-            {/* Resolved workflow blocks */}
+            {/* Resolution Form actions */}
             {selectedTicket.status === 'resolved' && (
               <div className="border-t border-brand-border/30 pt-4 space-y-4">
-                {/* Close with feedback */}
+                {/* Accept & Close */}
                 <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Close Ticket with feedback</h4>
+                  <h4 className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Close complaint with feedback</h4>
                   <div className="flex gap-2">
                     <input
                       type="text"
                       value={feedbackText}
                       onChange={(e) => setFeedbackText(e.target.value)}
-                      placeholder="Optional: How did the staff handle your complaint?"
-                      className="flex-1 bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-2.5 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
+                      placeholder="Optional feedback..."
+                      className="flex-1 bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-2 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
                     />
                     <button
                       onClick={() => handleCloseTicket(selectedTicket.id)}
-                      className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-xs"
+                      className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition"
                     >
                       Accept &amp; Close
                     </button>
                   </div>
                 </div>
 
-                <div className="h-px bg-brand-border/20" />
+                <div className="h-px bg-brand-border/25" />
 
-                {/* Reopen complaint (Requires mandatory reason) */}
+                {/* Reopen (Mandatory reason) */}
                 <div className="space-y-2">
                   <h4 className="text-xs font-bold text-brand-primary uppercase tracking-wider">Reopen complaint (If unresolved)</h4>
                   {reopenError && (
-                    <p className="text-[10px] text-brand-primary font-extrabold">{reopenError}</p>
+                    <p className="text-[10px] text-brand-primary font-bold">{reopenError}</p>
                   )}
                   <div className="flex gap-2">
                     <input
                       type="text"
                       value={reopenReason}
                       onChange={(e) => setReopenReason(e.target.value)}
-                      placeholder="Mandatory: Why is this complaint still unresolved?"
-                      className="flex-1 bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-2.5 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
+                      placeholder="Mandatory: Detail why this remains unresolved..."
+                      className="flex-1 bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-2 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
                     />
                     <button
                       onClick={() => handleReopenTicket(selectedTicket.id)}
-                      className="bg-transparent border border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-brand-white text-xs font-bold px-5 py-2.5 rounded-xl transition"
+                      className="bg-transparent border border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition"
                     >
                       Reopen Ticket
                     </button>

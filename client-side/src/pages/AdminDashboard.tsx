@@ -85,32 +85,32 @@ export const AdminDashboard: React.FC = () => {
   const sidebarTabs = [
     {
       id: 'tickets',
-      name: 'All Tickets Queue',
-      icon: <FiInbox className="h-5 w-5" />,
+      name: 'All Tickets',
+      icon: <FiInbox className="h-4 w-4" />,
       onClick: () => setActiveTab('tickets')
     },
     {
       id: 'staff',
-      name: 'Manage Staff Specialist',
-      icon: <FiUsers className="h-5 w-5" />,
+      name: 'Manage Staff',
+      icon: <FiUsers className="h-4 w-4" />,
       onClick: () => setActiveTab('staff')
     },
     {
       id: 'categories',
-      name: 'Category Settings',
-      icon: <FiSettings className="h-5 w-5" />,
+      name: 'Categories',
+      icon: <FiSettings className="h-4 w-4" />,
       onClick: () => setActiveTab('categories')
     },
     {
       id: 'registry',
-      name: 'Student Registry Verification',
-      icon: <FiShield className="h-5 w-5" />,
+      name: 'Registry',
+      icon: <FiShield className="h-4 w-4" />,
       onClick: () => setActiveTab('registry')
     },
     {
       id: 'reports',
-      name: 'Reports & Analytics',
-      icon: <FiBarChart2 className="h-5 w-5" />,
+      name: 'Reports',
+      icon: <FiBarChart2 className="h-4 w-4" />,
       onClick: () => setActiveTab('reports')
     }
   ];

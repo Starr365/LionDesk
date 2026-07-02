@@ -78,7 +78,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 <button
                   key={tab.id}
                   onClick={tab.onClick}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-extrabold transition text-left ${
+                  className={`w-full flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition text-left ${
                     isActive
                       ? 'bg-brand-primary text-brand-white shadow-sm shadow-brand-primary/10'
                       : 'text-brand-text-muted hover:text-brand-primary hover:bg-brand-silver/20'
@@ -110,7 +110,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                         tab.onClick();
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-extrabold transition text-left ${
+                      className={`w-full flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition text-left ${
                         isActive
                           ? 'bg-brand-primary text-brand-white'
                           : 'text-brand-text-muted hover:text-brand-primary hover:bg-brand-silver/20'
