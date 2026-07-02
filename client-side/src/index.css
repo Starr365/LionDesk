@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+@theme {
+  /* Raleway Font */
+  --font-sans: 'Raleway', sans-serif;
+
+  /* Brand Colors from PRD */
+  --color-brand-spruce: #004d26;
+  --color-brand-spruce-2: #00552a;
+  --color-brand-emerald: #005d2e;
+  --color-brand-emerald-2: #006633;
+  --color-brand-alice: #d4dee5;
+  --color-brand-alabaster: #F7F5F0;
+  --color-brand-silver: #b9c0c3;
+  --color-brand-white: #ffffff;
+  --color-brand-dim-grey: #686a6d;
+  --color-brand-grey: #76787a;
+
+  /* Semantic Theme Mappings */
+  --color-brand-bg: var(--color-brand-alabaster);
+  --color-brand-card: var(--color-brand-white);
+  --color-brand-border: var(--color-brand-silver);
+  
+  --color-brand-primary: var(--color-brand-spruce);
+  --color-brand-secondary: var(--color-brand-emerald);
+  --color-brand-dark: var(--color-brand-spruce-2);
+  --color-brand-light: var(--color-brand-alice);
+  
+  --color-brand-text-main: var(--color-brand-spruce);
+  --color-brand-text-muted: var(--color-brand-dim-grey);
+}

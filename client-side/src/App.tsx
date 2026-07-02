@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import StudentDashboard from './pages/StudentDashboard';
 import StaffDashboard from './pages/StaffDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import Docs from './pages/Docs';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -29,6 +30,7 @@ const App: React.FC = () => {
           <Route path="/student/dashboard" element={<StudentDashboard />} />
           <Route path="/staff/dashboard" element={<StaffDashboard />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/docs" element={<Docs />} />
         </Routes>
       </Router>
     </QueryClientProvider>

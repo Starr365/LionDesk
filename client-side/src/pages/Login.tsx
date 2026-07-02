@@ -1,9 +1,164 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Simple demo validation logic
+    if (email.includes('student')) {
+      navigate('/student/dashboard');
+    } else if (email.includes('staff')) {
+      navigate('/staff/dashboard');
+    } else if (email.includes('admin') || email.includes('hod')) {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/student/dashboard');
+    }
+  };
+
   return (
-    <div>
-      <h1>Login Placeholder (TypeScript)</h1>
+    <div className="min-h-screen bg-brand-bg text-brand-text-main flex flex-col justify-between p-6 relative overflow-hidden font-sans">
+      {/* Decorative Line Art Illustrations (as seen in the design inspiration) */}
+      <div className="absolute top-1/4 left-8 md:left-24 hidden lg:block opacity-60 pointer-events-none">
+        <svg width="220" height="200" viewBox="0 0 220 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* Scribble line detail */}
+          <path d="M10 80 Q 50 10, 100 80 T 190 80" stroke="#004d26" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          {/* Mock document border */}
+          <rect x="30" y="100" width="130" height="80" rx="6" stroke="#b9c0c3" strokeWidth="2" strokeDasharray="4 4" fill="none" />
+          <line x1="50" y1="125" x2="120" y2="125" stroke="#b9c0c3" strokeWidth="2" />
+          <line x1="50" y1="145" x2="100" y2="145" stroke="#b9c0c3" strokeWidth="2" />
+          <circle cx="145" cy="120" r="4" fill="#00FF87" />
+        </svg>
+      </div>
+
+      <div className="absolute bottom-1/4 right-8 md:right-20 hidden lg:flex flex-col items-center opacity-70 pointer-events-none">
+        {/* Desk worker line art */}
+        <svg width="280" height="240" viewBox="0 0 280 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* Laptop */}
+          <path d="M40 180 L110 180 L125 155 L65 155 Z" fill="none" stroke="#004d26" strokeWidth="2.5" />
+          {/* Student outline sitting */}
+          <path d="M150 200 C150 160, 130 140, 115 130 L115 90 C115 90, 125 90, 130 85 C135 80, 135 70, 130 65 C125 60, 115 65, 110 70 L100 85 L90 120 C90 120, 80 145, 95 155" stroke="#004d26" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+          {/* Solid stand pedestal block (spotted design matching inspo) */}
+          <rect x="135" y="175" width="65" height="60" fill="none" stroke="#004d26" strokeWidth="2.5" rx="4" />
+          <circle cx="150" cy="195" r="3" fill="#004d26" />
+          <circle cx="165" cy="210" r="3" fill="#004d26" />
+          <circle cx="180" cy="195" r="3" fill="#004d26" />
+          <circle cx="150" cy="215" r="3" fill="#004d26" />
+          <circle cx="170" cy="225" r="3" fill="#004d26" />
+        </svg>
+      </div>
+
+      {/* Header bar */}
+      <header className="max-w-7xl mx-auto w-full flex justify-between items-center">
+        <Link to="/" className="text-2xl font-bold bg-linear-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent">
+          LionDesk
+        </Link>
+        <div className="flex items-center space-x-4">
+          <Link to="/activate" className="text-sm font-semibold hover:text-brand-primary transition">
+            Sign up
+          </Link>
+          <Link to="/" className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4.5 py-2.5 rounded-lg transition shadow-xs">
+            Back to Home
+          </Link>
+        </div>
+      </header>
+
+      {/* Main card */}
+      <main className="flex-grow flex items-center justify-center py-10 z-10">
+        <div className="bg-brand-card border border-brand-border/40 w-full max-w-md rounded-3xl p-8 sm:p-10 shadow-xl space-y-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-text-main">
+              Portal Login
+            </h2>
+            <p className="text-sm text-brand-text-muted font-semibold leading-relaxed">
+              Hey, Enter your details to get sign in to your account.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+            <div className="space-y-1">
+              <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
+                Enter Email / Reg No.
+              </label>
+              <input
+                type="text"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@domain.com or matric_no"
+                className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
+                  Passcode
+                </label>
+                <Link to="/forgot-password" className="text-xs font-bold text-brand-primary hover:text-brand-primary-hover transition">
+                  Having trouble in sign in?
+                </Link>
+              </div>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-md hover:scale-[1.01] active:scale-[0.99] transition duration-200"
+            >
+              Sign in
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="flex items-center justify-between text-xs text-brand-text-muted/60 font-bold py-1">
+            <div className="h-px bg-brand-border/30 w-full" />
+            <span className="px-3 shrink-0 uppercase tracking-widest text-[10px]">Or Sign in with</span>
+            <div className="h-px bg-brand-border/30 w-full" />
+          </div>
+
+          {/* Social Sign-in grid */}
+          <div className="grid grid-cols-3 gap-3">
+            <button className="flex items-center justify-center space-x-1.5 py-2.5 px-3 border border-brand-border/50 hover:bg-brand-bg/40 rounded-xl transition text-[11px] font-bold text-brand-text-muted">
+              <span>Google</span>
+            </button>
+            <button className="flex items-center justify-center space-x-1.5 py-2.5 px-3 border border-brand-border/50 hover:bg-brand-bg/40 rounded-xl transition text-[11px] font-bold text-brand-text-muted">
+              <span>Apple ID</span>
+            </button>
+            <button className="flex items-center justify-center space-x-1.5 py-2.5 px-3 border border-brand-border/50 hover:bg-brand-bg/40 rounded-xl transition text-[11px] font-bold text-brand-text-muted">
+              <span>Facebook</span>
+            </button>
+          </div>
+
+          <div className="text-center text-xs text-brand-text-muted font-bold border-t border-brand-border/25 pt-4">
+            Don't have an account?{' '}
+            <Link to="/activate" className="text-brand-primary hover:text-brand-primary-hover transition">
+              Request Now
+            </Link>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer bar */}
+      <footer className="text-center text-[10px] text-brand-text-muted/75 font-semibold py-4 max-w-7xl mx-auto w-full border-t border-brand-border/20 flex justify-between items-center">
+        <span>Copyright @liondesk 2026</span>
+        <div className="space-x-4">
+          <Link to="/docs" className="hover:text-brand-primary transition">Privacy Policy</Link>
+          <span>|</span>
+          <Link to="/docs" className="hover:text-brand-primary transition">Terms of Service</Link>
+        </div>
+      </footer>
     </div>
   );
 };
