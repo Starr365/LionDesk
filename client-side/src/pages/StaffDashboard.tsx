@@ -107,6 +107,7 @@ export const StaffDashboard: React.FC = () => {
       userName={currentUser.name}
       activeTab={activeTab}
       tabs={sidebarTabs}
+      onAvatarClick={() => setActiveTab('profile')}
     >
       {/* Title */}
       <div>
@@ -186,6 +187,85 @@ export const StaffDashboard: React.FC = () => {
               }}
               showAssignee={false}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Tab 3: Staff Profile Details */}
+      {activeTab === 'profile' && (
+        <div className="space-y-6 animate-fade-in">
+          <div>
+            <h2 className="text-xl font-extrabold text-brand-text-main font-sans">Specialist Identity</h2>
+            <p className="text-xs text-brand-text-muted font-semibold mt-1">
+              Active departmental workload parameters loaded for {currentUser.name}.
+            </p>
+          </div>
+
+          <div className="bg-brand-card border border-brand-border/40 p-6 sm:p-8 rounded-3xl shadow-sm flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8">
+            <div className="h-24 w-24 rounded-full bg-brand-primary border-2 border-brand-secondary/40 flex items-center justify-center font-bold text-brand-white text-3xl shadow-md shrink-0">
+              CU
+            </div>
+            
+            <div className="flex-1 w-full space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="border-b border-brand-border/20 pb-2">
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Full Name</span>
+                  <span className="text-xs font-extrabold text-brand-text-main">{currentUser.name}</span>
+                </div>
+                <div className="border-b border-brand-border/20 pb-2">
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Specialist Role</span>
+                  <span className="text-xs font-extrabold text-brand-text-main capitalize">{currentUser.role}</span>
+                </div>
+                <div className="border-b border-brand-border/20 pb-2">
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Specialty Category</span>
+                  <span className="text-xs font-extrabold text-brand-primary">{currentUser.category}</span>
+                </div>
+                <div className="border-b border-brand-border/20 pb-2">
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Official Email</span>
+                  <span className="text-xs font-extrabold text-brand-text-main">{currentUser.email}</span>
+                </div>
+                <div className="border-b border-brand-border/20 pb-2">
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Department / School</span>
+                  <span className="text-xs font-extrabold text-brand-text-main">Computer Science, UNN</span>
+                </div>
+                <div className="border-b border-brand-border/20 pb-2">
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Account Status</span>
+                  <div>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-secondary/15 text-brand-secondary border border-brand-secondary/20">
+                      Active Provisioned
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mini Statistics Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="bg-brand-card border border-brand-border/40 p-5 rounded-2xl shadow-xs flex justify-between items-center">
+              <div>
+                <span className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Active Queue workload</span>
+                <h4 className="text-2xl font-extrabold text-brand-text-main mt-1">{activeWorkloadCount}</h4>
+              </div>
+              <button
+                onClick={() => setActiveTab('workload')}
+                className="bg-transparent border border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-brand-white text-xs font-bold px-3 py-1.5 rounded-lg transition"
+              >
+                View Workload
+              </button>
+            </div>
+            <div className="bg-brand-card border border-brand-border/40 p-5 rounded-2xl shadow-xs flex justify-between items-center">
+              <div>
+                <span className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Resolved complaints</span>
+                <h4 className="text-2xl font-extrabold text-brand-text-main mt-1">{resolvedCount}</h4>
+              </div>
+              <button
+                onClick={() => setActiveTab('history')}
+                className="bg-transparent border border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-brand-white text-xs font-bold px-3 py-1.5 rounded-lg transition"
+              >
+                View History
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -16,6 +16,7 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
   activeTab: string;
   tabs: SidebarTab[];
+  onAvatarClick?: () => void;
 }
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
@@ -23,7 +24,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   userName,
   children,
   activeTab,
-  tabs
+  tabs,
+  onAvatarClick
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -56,9 +58,13 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             <p className="text-xs font-bold text-brand-primary uppercase tracking-wide">{roleName}</p>
             <p className="text-sm font-extrabold text-brand-text-main leading-tight">{userName}</p>
           </div>
-          <div className="h-8 w-8 rounded-full bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center font-bold text-brand-primary text-sm shadow-xs">
+          <button
+            onClick={onAvatarClick}
+            className="h-8 w-8 rounded-full bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center font-bold text-brand-primary text-sm shadow-xs hover:bg-brand-primary hover:text-brand-white transition focus:outline-none shrink-0"
+            title="View Profile"
+          >
             {userName.split(' ').map((n) => n[0]).join('')}
-          </div>
+          </button>
           <button
             onClick={handleLogout}
             className="text-xs font-extrabold border border-brand-border/60 hover:border-brand-primary text-brand-text-muted hover:text-brand-primary px-3 py-1.5 rounded-lg transition"

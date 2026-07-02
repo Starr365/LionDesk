@@ -154,6 +154,7 @@ export const StudentDashboard: React.FC = () => {
       userName={currentUser.name}
       activeTab={activeTab}
       tabs={sidebarTabs}
+      onAvatarClick={() => setActiveTab('profile')}
     >
       {/* Tab 1: Overview */}
       {activeTab === 'overview' && (
@@ -306,6 +307,85 @@ export const StudentDashboard: React.FC = () => {
             }}
             showSubmitter={false}
           />
+        </div>
+      )}
+
+      {/* Tab 4: Student Profile Details */}
+      {activeTab === 'profile' && (
+        <div className="space-y-6 animate-fade-in">
+          <div>
+            <h2 className="text-xl font-extrabold text-brand-text-main font-sans">Student Identity</h2>
+            <p className="text-xs text-brand-text-muted font-semibold mt-1">
+              Pre-verified registry parameters loaded for Stella Starr.
+            </p>
+          </div>
+
+          <div className="bg-brand-card border border-brand-border/40 p-6 sm:p-8 rounded-3xl shadow-sm flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8">
+            <div className="h-24 w-24 rounded-full bg-brand-primary border-2 border-brand-secondary/40 flex items-center justify-center font-bold text-brand-white text-3xl shadow-md shrink-0">
+              SS
+            </div>
+            
+            <div className="flex-1 w-full space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="border-b border-brand-border/20 pb-2">
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Full Name</span>
+                  <span className="text-xs font-extrabold text-brand-text-main">{currentUser.name}</span>
+                </div>
+                <div className="border-b border-brand-border/20 pb-2">
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">University Registry Role</span>
+                  <span className="text-xs font-extrabold text-brand-text-main capitalize">{currentUser.role}</span>
+                </div>
+                <div className="border-b border-brand-border/20 pb-2">
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Registration Number</span>
+                  <span className="text-xs font-extrabold text-brand-primary">{currentUser.matricNo}</span>
+                </div>
+                <div className="border-b border-brand-border/20 pb-2">
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Registered Email</span>
+                  <span className="text-xs font-extrabold text-brand-text-main">{currentUser.email}</span>
+                </div>
+                <div className="border-b border-brand-border/20 pb-2">
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Department / Institution</span>
+                  <span className="text-xs font-extrabold text-brand-text-main">Computer Science, UNN</span>
+                </div>
+                <div className="border-b border-brand-border/20 pb-2">
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Verification Status</span>
+                  <div>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-secondary/15 text-brand-secondary border border-brand-secondary/20">
+                      Active Verified
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mini Statistics Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="bg-brand-card border border-brand-border/40 p-5 rounded-2xl shadow-xs flex justify-between items-center">
+              <div>
+                <span className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Active Inquiries</span>
+                <h4 className="text-2xl font-extrabold text-brand-text-main mt-1">{activeTickets}</h4>
+              </div>
+              <button
+                onClick={() => setActiveTab('history')}
+                className="bg-transparent border border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-brand-white text-xs font-bold px-3 py-1.5 rounded-lg transition"
+              >
+                View History
+              </button>
+            </div>
+            <div className="bg-brand-card border border-brand-border/40 p-5 rounded-2xl shadow-xs flex justify-between items-center">
+              <div>
+                <span className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Total Complaints Filed</span>
+                <h4 className="text-2xl font-extrabold text-brand-text-main mt-1">{totalSubmitted}</h4>
+              </div>
+              <button
+                onClick={() => setActiveTab('submit')}
+                className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-3 py-1.5 rounded-lg transition"
+              >
+                File New
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
