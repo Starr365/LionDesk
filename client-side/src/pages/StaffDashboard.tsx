@@ -3,6 +3,7 @@ import { mockDb, Ticket } from '../services/mockDb';
 import { DashboardLayout } from '../components/shared/DashboardLayout';
 import { StatCard } from '../components/shared/StatCard';
 import { TicketTable } from '../components/shared/TicketTable';
+import { FiClipboard, FiUsers, FiClock, FiCheckCircle } from 'react-icons/fi';
 
 export const StaffDashboard: React.FC = () => {
   // Use Dr. Charles Uzo as the active faculty staff user
@@ -85,11 +86,7 @@ export const StaffDashboard: React.FC = () => {
     {
       id: 'workload',
       name: 'Assigned Workload',
-      icon: (
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-      ),
+      icon: <FiClipboard className="h-5 w-5" />,
       onClick: () => setActiveTab('workload')
     }
   ];
@@ -117,31 +114,19 @@ export const StaffDashboard: React.FC = () => {
           title="Assigned Complaints"
           value={totalAssigned}
           description="Total lifetime tickets"
-          icon={
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-          }
+          icon={<FiUsers className="h-6 w-6" />}
         />
         <StatCard
           title="Active Queues"
           value={activeWorkload}
           description="Needs attention &amp; logs"
-          icon={
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          }
+          icon={<FiClock className="h-6 w-6" />}
         />
         <StatCard
           title="Resolved complaints"
           value={resolvedCount}
           description="Resolved or closed"
-          icon={
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          }
+          icon={<FiCheckCircle className="h-6 w-6" />}
         />
       </div>
 

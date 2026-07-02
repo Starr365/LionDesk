@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { FiMenu } from 'react-icons/fi';
 import logo from '../../assets/liondesk.svg';
 
 interface SidebarTab {
@@ -42,9 +43,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden text-brand-text-muted hover:text-brand-primary focus:outline-none"
           >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <FiMenu className="h-6 w-6" />
           </button>
           
           <Link to="/" className="flex items-center">
