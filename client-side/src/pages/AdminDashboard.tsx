@@ -224,7 +224,8 @@ export const AdminDashboard: React.FC = () => {
               </button>
             </div>
             <div className="bg-brand-card border border-brand-border/40 rounded-2xl overflow-hidden shadow-xs">
-              <table className="w-full text-left border-collapse">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-brand-border/30 bg-brand-bg/30 text-xs font-extrabold uppercase tracking-wider text-brand-text-muted">
                     <th className="py-4 px-6">Specialist Name</th>
@@ -275,7 +276,8 @@ export const AdminDashboard: React.FC = () => {
                     );
                   })}
                 </tbody>
-              </table>
+                </table>
+              </div>
             </div>
           </div>
         )}
@@ -364,7 +366,8 @@ export const AdminDashboard: React.FC = () => {
             <p className="text-xs text-brand-text-muted font-semibold">Pre-loaded matric credentials permitted to run registration activation.</p>
             
             <div className="bg-brand-card border border-brand-border/40 rounded-2xl overflow-hidden shadow-xs">
-              <table className="w-full text-left border-collapse">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-brand-border/30 bg-brand-bg/30 text-xs font-extrabold uppercase tracking-wider text-brand-text-muted">
                     <th className="py-4 px-6">Matric / Registration Number</th>
@@ -381,7 +384,8 @@ export const AdminDashboard: React.FC = () => {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+                </table>
+              </div>
             </div>
           </div>
         )}
