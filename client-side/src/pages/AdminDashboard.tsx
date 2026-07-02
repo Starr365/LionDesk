@@ -399,7 +399,7 @@ export const AdminDashboard: React.FC = () => {
                 </h3>
                 {/* SVG D3-style Bar Chart */}
                 <div className="flex justify-center py-4">
-                  <svg width="340" height="200" viewBox="0 0 340 200">
+                  <svg viewBox="0 0 340 200" className="w-full h-auto max-w-[340px]">
                     {/* Render Category Bars */}
                     {categories.map((cat, index) => {
                       const count = categoriesCount[cat.name] || 0;
@@ -444,7 +444,7 @@ export const AdminDashboard: React.FC = () => {
                 </h3>
                 {/* SVG Pie Chart/Donut Chart */}
                 <div className="flex flex-col sm:flex-row items-center justify-around py-4 gap-4">
-                  <svg width="150" height="150" viewBox="0 0 150 150">
+                  <svg viewBox="0 0 150 150" className="w-full h-auto max-w-[150px]">
                     <circle cx="75" cy="75" r="50" fill="none" stroke="#e1e5e9" strokeWidth="20" />
                     {/* Custom dynamic visual slices based on ratios */}
                     {Object.keys(statusCount).length > 0 ? (

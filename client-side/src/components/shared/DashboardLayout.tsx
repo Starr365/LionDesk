@@ -78,10 +78,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 <button
                   key={tab.id}
                   onClick={tab.onClick}
-                  className={`w-full flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition text-left ${
+                  className={`w-full flex items-center space-x-2.5 rounded-xl text-xs tracking-wide transition-all duration-155 text-left ${
                     isActive
-                      ? 'bg-brand-primary text-brand-white shadow-sm shadow-brand-primary/10'
-                      : 'text-brand-text-muted hover:text-brand-primary hover:bg-brand-silver/20'
+                      ? 'bg-brand-primary text-brand-white shadow-md shadow-brand-primary/25 px-4.5 py-3.5 font-bold scale-[1.02]'
+                      : 'text-brand-text-muted hover:text-brand-primary hover:bg-brand-silver/20 px-3.5 py-2.5 font-semibold'
                   }`}
                 >
                   {tab.icon}
@@ -110,10 +110,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                         tab.onClick();
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition text-left ${
+                      className={`w-full flex items-center space-x-2.5 rounded-xl text-xs tracking-wide transition-all duration-155 text-left ${
                         isActive
-                          ? 'bg-brand-primary text-brand-white'
-                          : 'text-brand-text-muted hover:text-brand-primary hover:bg-brand-silver/20'
+                          ? 'bg-brand-primary text-brand-white px-4.5 py-3.5 font-bold scale-[1.02]'
+                          : 'text-brand-text-muted hover:text-brand-primary hover:bg-brand-silver/20 px-3.5 py-2.5 font-semibold'
                       }`}
                     >
                       {tab.icon}
