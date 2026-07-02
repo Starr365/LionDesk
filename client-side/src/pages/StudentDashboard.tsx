@@ -3,7 +3,7 @@ import { mockDb, Ticket, Category } from '../services/mockDb';
 import { DashboardLayout } from '../components/shared/DashboardLayout';
 import { StatCard } from '../components/shared/StatCard';
 import { TicketTable } from '../components/shared/TicketTable';
-import { FiHome, FiClock, FiCheckCircle, FiFileText } from 'react-icons/fi';
+import { FiHome, FiClock, FiCheckCircle, FiFileText, FiUser } from 'react-icons/fi';
 
 export const StudentDashboard: React.FC = () => {
   const currentUser = { id: 'usr-2', name: 'Stella Starr', role: 'student' as const };
@@ -145,6 +145,12 @@ export const StudentDashboard: React.FC = () => {
       name: 'My History',
       icon: <FiClock className="h-4 w-4" />,
       onClick: () => setActiveTab('history')
+    },
+    {
+      id: 'profile',
+      name: 'Profile',
+      icon: <FiUser className="h-4 w-4" />,
+      onClick: () => setActiveTab('profile')
     }
   ];
 
