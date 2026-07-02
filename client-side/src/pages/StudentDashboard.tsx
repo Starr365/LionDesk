@@ -6,7 +6,7 @@ import { TicketTable } from '../components/shared/TicketTable';
 import { FiHome, FiClock, FiCheckCircle, FiFileText, FiUser } from 'react-icons/fi';
 
 export const StudentDashboard: React.FC = () => {
-  const currentUser = { id: 'usr-2', name: 'Stella Starr', role: 'student' as const };
+  const currentUser = { id: 'usr-2', name: 'Stella Starr', role: 'student' as const, matricNo: '2022/240456', email: 'stella.starr.student@unn.edu.ng' };
   
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);

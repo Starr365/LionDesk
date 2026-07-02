@@ -6,7 +6,7 @@ import { TicketTable } from '../components/shared/TicketTable';
 import { FiClipboard, FiUsers, FiClock, FiCheckCircle, FiUser } from 'react-icons/fi';
 
 export const StaffDashboard: React.FC = () => {
-  const currentUser = { id: 'usr-3', name: 'Dr. Charles Uzo', role: 'staff' as const, category: 'Academic' };
+  const currentUser = { id: 'usr-3', name: 'Dr. Charles Uzo', role: 'staff' as const, category: 'Academic', email: 'charles.uzo.staff@unn.edu.ng' };
 
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [activeTab, setActiveTab] = useState('workload');

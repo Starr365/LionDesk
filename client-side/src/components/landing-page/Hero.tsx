@@ -50,7 +50,7 @@ export const Hero: React.FC = () => {
         <div className="w-full max-w-5xl pt-8 md:pt-12">
           <div className="relative group rounded-2xl overflow-hidden bg-brand-card border border-brand-border/40 p-1.5 sm:p-2.5 shadow-xl">
             {/* Outer border glow */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-brand-primary/5 to-brand-secondary/5 opacity-80 group-hover:opacity-100 transition duration-300 pointer-events-none rounded-2xl" />
+            <div className="absolute inset-0 bg-linear-to-tr from-brand-primary/5 to-brand-secondary/5 opacity-80 group-hover:opacity-100 transition duration-300 pointer-events-none rounded-2xl" />
             <img
               src={heroMockup}
               alt="LionDesk Dual-Pane Support Mockup Dashboard"
