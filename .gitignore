@@ -1,0 +1,15 @@
+# Exclude PRDs as requested
+PRD.md
+HelpDesk_PRD_Group5.docx
+
+# Dependencies and build folders
+node_modules/
+dist/
+.env
+.env.local
+
+# Sub-directory node_modules and builds (redundancy protection)
+client-side/node_modules/
+client-side/dist/
+server-side/node_modules/
+server-side/.env

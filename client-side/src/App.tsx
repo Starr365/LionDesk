@@ -1,0 +1,38 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import LandingPage from './pages/LandingPage';
+import Activate from './pages/Activate';
+import Login from './pages/Login';
+import StudentDashboard from './pages/StudentDashboard';
+import StaffDashboard from './pages/StaffDashboard';
+import AdminDashboard from './pages/AdminDashboard';
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+const App: React.FC = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/activate" element={<Activate />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/student/dashboard" element={<StudentDashboard />} />
+          <Route path="/staff/dashboard" element={<StaffDashboard />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        </Routes>
+      </Router>
+    </QueryClientProvider>
+  );
+};
+
+export default App;
