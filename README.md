@@ -1,14 +1,14 @@
-# LionDesk: Departmental Help-Desk & Ticketing System
+# LionDesk: Departmental Help-Desk System
 
-LionDesk is a premium, automated web-based ticketing platform built specifically for the students, faculty, and administration of the Department of Computer Science at the University of Nigeria, Nsukka (UNN). It resolves the chronic communication gaps in high-volume academic environments by allowing students to submit detailed registry, facility, or course complaints, automatically routing those complaints to the exact workstation of designated staff specialists, and escalating neglected requests to the Head of Department (HOD) for administrative review.
+LionDesk is a premium, automated web-based ticketing platform built specifically for the students, staff, and administration of the Department of Computer Science at the University of Nigeria, Nsukka (UNN). It resolves the chronic communication gaps in high-volume academic environments by allowing students to submit detailed registry, facility, or course complaints, automatically routing those complaints to the exact workstation of designated staff specialists, and escalating neglected requests to the Head of Department (HOD) for administrative review.
 
 ---
 
 ## 🛠️ Technologies Used
-*   **Frontend**: React 19 with TypeScript, Vite, Tailwind CSS v4, Zustand (client session state), TanStack Query (server state synchronization & caching).
+*   **Frontend**: React with TypeScript, Vite, Tailwind CSS v4, TanStack Query (server state synchronization & caching).
 *   **Backend**: Node.js with Express.js, Socket.IO (instant WebSocket updates).
 *   **Database**: MySQL 8.x (relational schema with key-constraint bindings and ACID transaction guarantees).
-*   **Utilities & Services**: Resend API (email notifications), Swagger UI (REST documentation at `/api-docs/`), node-cron (hourly automated business-day escalation checking).
+*   **Services**: Resend API (email notifications), Swagger UI (REST documentation at `/api-docs/`), node-cron (hourly automated business-day escalation checking).
 
 ---
 
@@ -70,7 +70,7 @@ Follow these step-by-step commands to get the system running locally in under 5 
 4.  Configure `.env` using these example variables:
     ```ini
     PORT=5000
-    JWT_SECRET=super_secret_liondesk_token_signature_key_2026
+    JWT_SECRET=super_secret
     RESEND_API_KEY=re_123456789abc_examplekey
     EMAIL_FROM=liondesk@unn.edu.ng
     DB_HOST=127.0.0.1
