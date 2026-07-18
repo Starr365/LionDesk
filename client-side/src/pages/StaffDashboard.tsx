@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../components/shared/AuthContext';
 import { useSocketContext } from '../components/shared/SocketContext';
-import { useTickets, Ticket } from '../hooks/useTickets';
+import { useTickets } from '../hooks/useTickets';
 import { DashboardLayout } from '../components/shared/DashboardLayout';
 import { StatCard } from '../components/shared/StatCard';
 import { TicketTable } from '../components/shared/TicketTable';
 import { EmptyState } from '../components/shared/EmptyState';
-import { FiClipboard, FiUsers, FiClock, FiCheckCircle, FiUser } from 'react-icons/fi';
+import { FiClipboard, FiClock, FiCheckCircle, FiUser } from 'react-icons/fi';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const StaffDashboard: React.FC = () => {
@@ -146,7 +146,7 @@ export const StaffDashboard: React.FC = () => {
 
   return (
     <DashboardLayout
-      roleName="Staff Specialist"
+      roleName="Faculty Staff"
       userName={currentUser.name}
       activeTab={activeTab}
       tabs={sidebarTabs}
@@ -334,13 +334,13 @@ export const StaffDashboard: React.FC = () => {
             <div className="flex justify-between items-start border-b border-brand-border/30 pb-4">
               <div>
                 <span className="text-[10px] font-extrabold bg-brand-silver/10 px-2 py-0.5 rounded text-brand-text-muted uppercase">
-                  {selectedTicket.category_name || selectedTicket.category}
+                  {selectedTicket.category_name}
                 </span>
                 <h3 className="text-lg font-extrabold text-brand-text-main mt-2">
                   {selectedTicket.ticket_ref}: {selectedTicket.title}
                 </h3>
                 <p className="text-[10px] text-brand-text-muted font-bold mt-1">
-                  Submitted: {new Date(selectedTicket.created_at || '').toLocaleString()} by {selectedTicket.student_name || selectedTicket.studentName}
+                  Submitted: {new Date(selectedTicket.created_at || '').toLocaleString()} by {selectedTicket.student_name}
                 </p>
               </div>
               <button

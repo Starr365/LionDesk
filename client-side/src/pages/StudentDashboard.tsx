@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../components/shared/AuthContext';
 import { useSocketContext } from '../components/shared/SocketContext';
-import { useTickets, Ticket } from '../hooks/useTickets';
+import { useTickets } from '../hooks/useTickets';
 import { useCategories } from '../hooks/useCategories';
 import { DashboardLayout } from '../components/shared/DashboardLayout';
 import { StatCard } from '../components/shared/StatCard';
@@ -37,8 +37,7 @@ export const StudentDashboard: React.FC = () => {
   // New Comment state
   const [commentText, setCommentText] = useState('');
 
-  // Hooks integration
-  const { useMyTickets, useTicketDetails, createTicket, updateStatus, addComment, reopenTicket: triggerReopen, submitFeedback: triggerFeedback } = useTickets();
+  const { useMyTickets, useTicketDetails, createTicket, addComment, reopenTicket: triggerReopen, submitFeedback: triggerFeedback } = useTickets();
   const { useCategoriesList } = useCategories();
 
   const { data: tickets = [], isLoading: ticketsLoading } = useMyTickets();
@@ -477,7 +476,7 @@ export const StudentDashboard: React.FC = () => {
             <div className="flex justify-between items-start border-b border-brand-border/30 pb-4">
               <div>
                 <span className="text-[10px] font-extrabold bg-brand-silver/10 px-2 py-0.5 rounded text-brand-text-muted uppercase">
-                  {selectedTicket.category_name || selectedTicket.category}
+                  {selectedTicket.category_name}
                 </span>
                 <h3 className="text-lg font-extrabold text-brand-text-main mt-2">
                   {selectedTicket.ticket_ref}: {selectedTicket.title}

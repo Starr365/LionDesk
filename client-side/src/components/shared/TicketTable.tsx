@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Unified client-side Ticket interface matching both formats
 interface Ticket {
   id: number;
   ticket_ref: string;
@@ -9,8 +8,8 @@ interface Ticket {
   category_name?: string;
   studentName?: string;
   student_name?: string;
-  staffName?: string;
-  staff_name?: string;
+  staffName?: string | null;
+  staff_name?: string | null;
   status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened' | 'escalated';
   created_at: string;
   date?: string; // Fallback
