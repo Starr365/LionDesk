@@ -1,23 +1,43 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import { useAuthContext } from '../components/shared/AuthContext';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const { login: saveSession } = useAuthContext();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple demo validation logic
-    if (email.includes('student')) {
-      navigate('/student');
-    } else if (email.includes('staff')) {
-      navigate('/staff');
-    } else if (email.includes('admin') || email.includes('hod')) {
-      navigate('/admin');
-    } else {
-      navigate('/student');
-    }
+    setErrorMsg('');
+
+    login.mutate(
+      { email: email.trim(), password },
+      {
+        onSuccess: (data) => {
+          if (data.token && data.user) {
+            saveSession(data.token, data.user);
+            
+            // Redirect based on role
+            if (data.user.role === 'admin') {
+              navigate('/admin');
+            } else if (data.user.role === 'staff') {
+              navigate('/staff');
+            } else {
+              navigate('/student');
+            }
+          }
+        },
+        onError: (err: any) => {
+          const errMsg = err.response?.data?.error || 'Invalid credentials or connection error.';
+          setErrorMsg(errMsg);
+        }
+      }
+    );
   };
 
   return (
@@ -78,6 +98,12 @@ const Login: React.FC = () => {
               Hey, Enter your details to get sign in to your account.
             </p>
           </div>
+
+          {errorMsg && (
+            <div className="p-3.5 bg-red-500/10 border border-red-500/30 text-red-700 text-xs font-semibold rounded-xl text-center leading-relaxed">
+              {errorMsg}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4 pt-2">
             <div className="space-y-1">
