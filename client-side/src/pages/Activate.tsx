@@ -2,17 +2,84 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Activate: React.FC = () => {
+  const [step, setStep] = useState(1);
   const [matricNumber, setMatricNumber] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleActivate = (e: React.FormEvent) => {
+  // Step 1: Verify matric number + official name
+  const handleVerifyRegistry = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Activation details:', { matricNumber, fullName, email, password });
-    // Demo redirects on success
-    navigate('/student');
+    setErrorMsg('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/verify-registry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matric_no: matricNumber.trim(), full_name: fullName.trim() })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErrorMsg(data.error || 'Verification failed. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Success -> prefill email, move to step 2
+      if (data.email) {
+        setEmail(data.email);
+      }
+      setStep(2);
+    } catch (err) {
+      setErrorMsg('Cannot connect to verification server. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 2: Set password and finalize registration
+  const handleFinalizeActivation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          matric_no: matricNumber.trim(),
+          full_name: fullName.trim(),
+          email: email.trim(),
+          password
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErrorMsg(data.error || 'Activation failed.');
+        return;
+      }
+
+      // Log in user by storing token
+      if (data.token) {
+        localStorage.setItem('jwt', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
+      navigate('/student');
+    } catch (err) {
+      setErrorMsg('Server connection failed. Try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -64,74 +131,104 @@ const Activate: React.FC = () => {
               Student Activation
             </h2>
             <p className="text-sm text-brand-text-muted font-semibold leading-relaxed">
-              Activate your account using pre-verified registration details.
+              {step === 1 
+                ? 'Step 1: Enter your official registration details to verify registry records.' 
+                : 'Step 2: Confirm your portal email and create a secure login password.'}
             </p>
           </div>
 
-          <form onSubmit={handleActivate} className="space-y-4 pt-2">
-            <div className="space-y-1">
-              <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
-                Matric / Reg Number
-              </label>
-              <input
-                type="text"
-                required
-                value={matricNumber}
-                onChange={(e) => setMatricNumber(e.target.value)}
-                placeholder="e.g., 202X/XXXXXX"
-                className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
-              />
+          {errorMsg && (
+            <div className="p-3.5 bg-red-500/10 border border-red-500/30 text-red-700 text-xs font-semibold rounded-xl text-center leading-relaxed">
+              {errorMsg}
             </div>
+          )}
 
-            <div className="space-y-1">
-              <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
-                Full Name
-              </label>
-              <input
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="As registered in DB"
-                className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
-              />
-            </div>
+          {step === 1 ? (
+            <form onSubmit={handleVerifyRegistry} className="space-y-4 pt-2">
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
+                  Matric / Reg Number
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={matricNumber}
+                  onChange={(e) => setMatricNumber(e.target.value)}
+                  placeholder="e.g., 2022/240456"
+                  className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
+                />
+              </div>
 
-            <div className="space-y-1">
-              <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
-                Email Address
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Preferred portal email"
-                className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
-              />
-            </div>
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Official Name registered in DB"
+                  className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
+                />
+              </div>
 
-            <div className="space-y-1">
-              <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
-                Create Password
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
-              />
-            </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-md hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 transition duration-200"
+              >
+                {loading ? 'Verifying...' : 'Verify Registry'}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleFinalizeActivation} className="space-y-4 pt-2 animate-fade-in">
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Preferred portal email"
+                  className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
+                />
+              </div>
 
-            <button
-              type="submit"
-              className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-md hover:scale-[1.01] active:scale-[0.99] transition duration-200"
-            >
-              Activate Profile
-            </button>
-          </form>
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
+                  Create Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => { setStep(1); setErrorMsg(''); }}
+                  className="w-1/3 bg-transparent border border-brand-border/50 text-brand-text-muted hover:text-brand-text-main font-bold py-3.5 px-4 rounded-xl transition duration-200"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-2/3 bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-md hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 transition duration-200"
+                >
+                  {loading ? 'Activating...' : 'Activate Profile'}
+                </button>
+              </div>
+            </form>
+          )}
 
           <div className="text-center text-xs text-brand-text-muted font-bold border-t border-brand-border/25 pt-4">
             Already activated?{' '}

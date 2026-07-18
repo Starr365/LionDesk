@@ -13,6 +13,51 @@ const generateToken = (user) => {
 };
 
 /**
+ * POST /api/auth/verify-registry
+ * Pre-activation verification step. Checks matric number, activation status, and name match.
+ */
+export const verifyRegistry = async (req, res) => {
+  try {
+    const { matric_no, full_name } = req.body;
+
+    if (!matric_no || !full_name) {
+      return res.status(400).json({ error: 'Registration number and name are required.' });
+    }
+
+    // 1. Check registry by matric_no only to provide precise error messages
+    const [registryRows] = await pool.query(
+      `SELECT * FROM student_registry WHERE matric_no = ?`,
+      [matric_no]
+    );
+
+    if (registryRows.length === 0) {
+      return res.status(404).json({ error: 'Registration number not found in student registry.' });
+    }
+
+    const record = registryRows[0];
+
+    // 2. Check if already activated
+    if (record.is_used) {
+      return res.status(409).json({ error: 'This registration number has already been activated.' });
+    }
+
+    // 3. Verify name (case-insensitive)
+    if (record.full_name.toLowerCase() !== full_name.trim().toLowerCase()) {
+      return res.status(400).json({ error: 'The name provided does not match the official record for this registration number.' });
+    }
+
+    // 4. Return success and registry email
+    res.json({
+      message: 'Registration credentials verified successfully.',
+      email: record.email
+    });
+  } catch (error) {
+    console.error('[Auth] Registry verification error:', error.message);
+    res.status(500).json({ error: 'Server error during verification.' });
+  }
+};
+
+/**
  * POST /api/auth/activate
  * Student self-activation via matric number verification.
  */
@@ -30,18 +75,24 @@ export const activate = async (req, res) => {
       return res.status(400).json({ error: 'Password must be at least 6 characters.' });
     }
 
-    // 1. Check student_registry for matching matric + name
-    const [registry] = await pool.query(
-      `SELECT * FROM student_registry WHERE matric_no = ? AND LOWER(full_name) = LOWER(?)`,
-      [matric_no, full_name]
+    // 1. Rerun checks with precise errors (secures final registration step)
+    const [registryRows] = await pool.query(
+      `SELECT * FROM student_registry WHERE matric_no = ?`,
+      [matric_no]
     );
 
-    if (registry.length === 0) {
-      return res.status(404).json({ error: 'No matching record found in the student registry.' });
+    if (registryRows.length === 0) {
+      return res.status(404).json({ error: 'Registration number not found in student registry.' });
     }
 
-    if (registry[0].is_used) {
+    const record = registryRows[0];
+
+    if (record.is_used) {
       return res.status(409).json({ error: 'This registration number has already been activated.' });
+    }
+
+    if (record.full_name.toLowerCase() !== full_name.trim().toLowerCase()) {
+      return res.status(400).json({ error: 'The name provided does not match the official record for this registration number.' });
     }
 
     // 2. Check if email already exists in users table
@@ -54,7 +105,7 @@ export const activate = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const [userResult] = await pool.query(
       `INSERT INTO users (email, password, role, full_name) VALUES (?, ?, 'student', ?)`,
-      [email, hashedPassword, full_name]
+      [email, hashedPassword, record.full_name]
     );
 
     // 4. Create student record
@@ -66,11 +117,11 @@ export const activate = async (req, res) => {
     // 5. Mark registry entry as used
     await pool.query(
       `UPDATE student_registry SET is_used = TRUE WHERE id = ?`,
-      [registry[0].id]
+      [record.id]
     );
 
     // 6. Generate JWT and return
-    const user = { id: userResult.insertId, role: 'student', full_name, email };
+    const user = { id: userResult.insertId, role: 'student', full_name: record.full_name, email };
     const token = generateToken(user);
 
     res.status(201).json({

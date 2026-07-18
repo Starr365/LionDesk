@@ -85,6 +85,34 @@ const options = {
       }
     },
     paths: {
+      '/api/auth/verify-registry': {
+        post: {
+          summary: 'Student Registry Verification',
+          description: 'Validates matriculation number and name against registry records before letting student set email and password.',
+          tags: ['Auth'],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['matric_no', 'full_name'],
+                  properties: {
+                    matric_no: { type: 'string', example: '2022/240456' },
+                    full_name: { type: 'string', example: 'Stella Starr' }
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            200: { description: 'Registration credentials verified successfully. Returns official email address.' },
+            400: { description: 'Name mismatch or missing fields.' },
+            404: { description: 'Registration number not found.' },
+            409: { description: 'Account already activated.' }
+          }
+        }
+      },
       '/api/auth/activate': {
         post: {
           summary: 'Student Self-Activation',
