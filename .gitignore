@@ -7,6 +7,8 @@ node_modules/
 dist/
 .env
 .env.local
+.env.example
+
 
 # Sub-directory node_modules and builds (redundancy protection)
 client-side/node_modules/
