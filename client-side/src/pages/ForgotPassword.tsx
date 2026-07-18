@@ -1,14 +1,29 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const { forgotPassword } = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-    setSubmitted(true);
+    setErrorMsg('');
+
+    forgotPassword.mutate(
+      { email: email.trim() },
+      {
+        onSuccess: () => {
+          setSubmitted(true);
+        },
+        onError: (err: any) => {
+          setErrorMsg(err.response?.data?.error || 'Failed to dispatch reset email.');
+        }
+      }
+    );
   };
 
   return (
@@ -41,6 +56,12 @@ const ForgotPassword: React.FC = () => {
               Retrieve access to your portal account.
             </p>
           </div>
+
+          {errorMsg && (
+            <div className="p-3.5 bg-red-500/10 border border-red-500/30 text-red-700 text-xs font-semibold rounded-xl text-center leading-relaxed">
+              {errorMsg}
+            </div>
+          )}
 
           {!submitted ? (
             <form onSubmit={handleSubmit} className="space-y-4 pt-2">

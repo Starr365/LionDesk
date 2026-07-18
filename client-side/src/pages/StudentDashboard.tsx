@@ -1,24 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { mockDb, Ticket, Category } from '../services/mockDb';
+import { useAuthContext } from '../components/shared/AuthContext';
+import { useSocketContext } from '../components/shared/SocketContext';
+import { useTickets, Ticket } from '../hooks/useTickets';
+import { useCategories } from '../hooks/useCategories';
 import { DashboardLayout } from '../components/shared/DashboardLayout';
 import { StatCard } from '../components/shared/StatCard';
 import { TicketTable } from '../components/shared/TicketTable';
+import { EmptyState } from '../components/shared/EmptyState';
 import { FiHome, FiClock, FiCheckCircle, FiFileText, FiUser } from 'react-icons/fi';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const StudentDashboard: React.FC = () => {
-  const currentUser = { id: 'usr-2', name: 'Stella Starr', role: 'student' as const, matricNo: '2022/240456', email: 'stella.starr.student@unn.edu.ng' };
-  
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { user: currentUser, logout } = useAuthContext();
+  const { socket } = useSocketContext();
+  const queryClient = useQueryClient();
+
   const [activeTab, setActiveTab] = useState('overview');
-  
+
   // Detail Modal state
   const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
-  
+  const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
+
   // Submit Ticket Form state
   const [newTitle, setNewTitle] = useState('');
-  const [newCategory, setNewCategory] = useState('');
+  const [newCategoryId, setNewCategoryId] = useState<number>(0);
   const [newDescription, setNewDescription] = useState('');
   const [submitError, setSubmitError] = useState('');
 
@@ -32,31 +37,51 @@ export const StudentDashboard: React.FC = () => {
   // New Comment state
   const [commentText, setCommentText] = useState('');
 
-  // Load database state
-  const loadData = () => {
-    const studentTickets = mockDb.getTickets().filter((t) => t.studentId === currentUser.id);
-    setTickets(studentTickets);
-    setCategories(mockDb.getCategories());
-    
-    if (selectedTicket) {
-      const updated = mockDb.getTicketById(selectedTicket.id);
-      if (updated) {
-        setSelectedTicket(updated);
-      }
-    }
-  };
+  // Hooks integration
+  const { useMyTickets, useTicketDetails, createTicket, updateStatus, addComment, reopenTicket: triggerReopen, submitFeedback: triggerFeedback } = useTickets();
+  const { useCategoriesList } = useCategories();
 
+  const { data: tickets = [], isLoading: ticketsLoading } = useMyTickets();
+  const { data: categories = [] } = useCategoriesList();
+  const { data: selectedTicket } = useTicketDetails(selectedTicketId || 0);
+
+  // Setup live WebSocket invalidations for immediate updates
   useEffect(() => {
-    loadData();
-    window.addEventListener('mockDbUpdate', loadData);
-    return () => window.removeEventListener('mockDbUpdate', loadData);
-  }, [selectedTicket]);
+    if (!socket) return;
+
+    const handleTicketUpdate = () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets', 'my'] });
+      if (selectedTicketId) {
+        queryClient.invalidateQueries({ queryKey: ['tickets', 'detail', selectedTicketId] });
+      }
+    };
+
+    socket.on('ticket:created', handleTicketUpdate);
+    socket.on('ticket:status_changed', handleTicketUpdate);
+    socket.on('ticket:commented', handleTicketUpdate);
+    socket.on('ticket:reassigned', handleTicketUpdate);
+
+    return () => {
+      socket.off('ticket:created', handleTicketUpdate);
+      socket.off('ticket:status_changed', handleTicketUpdate);
+      socket.off('ticket:commented', handleTicketUpdate);
+      socket.off('ticket:reassigned', handleTicketUpdate);
+    };
+  }, [socket, selectedTicketId, queryClient]);
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-brand-bg flex items-center justify-center">
+        <p className="text-brand-text-muted font-bold animate-pulse">Checking authorization status...</p>
+      </div>
+    );
+  }
 
   const handleCreateTicket = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError('');
 
-    if (!newCategory) {
+    if (!newCategoryId) {
       setSubmitError('Please select a category.');
       return;
     }
@@ -65,58 +90,69 @@ export const StudentDashboard: React.FC = () => {
       return;
     }
 
-    mockDb.createTicket({
-      title: newTitle,
-      description: newDescription,
-      category: newCategory,
-      studentId: currentUser.id,
-      studentName: currentUser.name
-    });
-
-    // Reset Form & Switch Tab to history to see the new ticket
-    setNewTitle('');
-    setNewCategory('');
-    setNewDescription('');
-    setActiveTab('history');
+    createTicket.mutate(
+      { title: newTitle, description: newDescription, category_id: newCategoryId },
+      {
+        onSuccess: () => {
+          setNewTitle('');
+          setNewCategoryId(0);
+          setNewDescription('');
+          setActiveTab('history');
+        },
+        onError: (err: any) => {
+          setSubmitError(err.response?.data?.error || 'Failed to submit complaint.');
+        }
+      }
+    );
   };
 
   const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!commentText.trim() || !selectedTicket) return;
+    if (!commentText.trim() || !selectedTicketId) return;
 
-    mockDb.addComment(selectedTicket.id, {
-      authorId: currentUser.id,
-      authorName: currentUser.name,
-      authorRole: 'student',
-      text: commentText
-    });
-
-    setCommentText('');
+    addComment.mutate(
+      { id: selectedTicketId, text: commentText.trim() },
+      {
+        onSuccess: () => {
+          setCommentText('');
+        }
+      }
+    );
   };
 
-  const handleCloseTicket = (ticketId: string) => {
-    mockDb.updateTicketStatus(ticketId, 'closed', {
-      feedback: feedbackText || 'No feedback text submitted.'
-    });
-    setFeedbackText('');
-    setDetailModalOpen(false);
-    setSelectedTicket(null);
+  const handleCloseTicket = (ticketId: number) => {
+    triggerFeedback.mutate(
+      { id: ticketId, feedback: feedbackText || 'No feedback text submitted.' },
+      {
+        onSuccess: () => {
+          setFeedbackText('');
+          setDetailModalOpen(false);
+          setSelectedTicketId(null);
+        }
+      }
+    );
   };
 
-  const handleReopenTicket = (ticketId: string) => {
+  const handleReopenTicket = (ticketId: number) => {
     setReopenError('');
     if (!reopenReason.trim()) {
       setReopenError('A reason is mandatory to reopen a resolved ticket.');
       return;
     }
 
-    mockDb.updateTicketStatus(ticketId, 'reopened', {
-      reopenReason: reopenReason
-    });
-
-    setReopenReason('');
-    setDetailModalOpen(false);
-    setSelectedTicket(null);
+    triggerReopen.mutate(
+      { id: ticketId, reason: reopenReason.trim() },
+      {
+        onSuccess: () => {
+          setReopenReason('');
+          setDetailModalOpen(false);
+          setSelectedTicketId(null);
+        },
+        onError: (err: any) => {
+          setReopenError(err.response?.data?.error || 'Failed to reopen ticket.');
+        }
+      }
+    );
   };
 
   // Stats derivations
@@ -154,6 +190,8 @@ export const StudentDashboard: React.FC = () => {
     }
   ];
 
+  const activeCategories = categories.filter(c => c.is_active);
+
   return (
     <DashboardLayout
       roleName="Student"
@@ -169,7 +207,7 @@ export const StudentDashboard: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-xl sm:text-2xl font-extrabold text-brand-text-main font-sans">
-                Welcome back, Stella Starr
+                Welcome back, {currentUser.name}
               </h1>
               <p className="text-brand-text-muted text-xs font-semibold">
                 Track your student complaints or log a new assistance ticket.
@@ -218,14 +256,29 @@ export const StudentDashboard: React.FC = () => {
                 </button>
               )}
             </div>
-            <TicketTable
-              tickets={tickets.slice(0, 3)}
-              onViewDetails={(ticket) => {
-                setSelectedTicket(ticket);
-                setDetailModalOpen(true);
-              }}
-              showSubmitter={false}
-            />
+
+            {ticketsLoading ? (
+              <p className="text-xs italic text-brand-text-muted/60">Loading your tickets...</p>
+            ) : tickets.length === 0 ? (
+              <EmptyState
+                title="No complaints logged yet"
+                description="You currently have a clean registry. If you have any issue regarding exams, lecture schedules, portal registry, or department computer labs, file a complaint."
+                icon="inbox"
+                actionButton={{
+                  label: "File Complaint",
+                  onClick: () => setActiveTab('submit')
+                }}
+              />
+            ) : (
+              <TicketTable
+                tickets={tickets.slice(0, 3)}
+                onViewDetails={(ticket) => {
+                  setSelectedTicketId(ticket.id);
+                  setDetailModalOpen(true);
+                }}
+                showSubmitter={false}
+              />
+            )}
           </div>
         </div>
       )}
@@ -242,7 +295,7 @@ export const StudentDashboard: React.FC = () => {
 
           <form onSubmit={handleCreateTicket} className="space-y-4">
             {submitError && (
-              <div className="p-3 bg-brand-primary/5 border border-brand-primary text-brand-primary text-xs font-bold rounded-lg">
+              <div className="p-3 bg-red-500/10 border border-red-500/35 text-red-700 text-xs font-bold rounded-lg">
                 {submitError}
               </div>
             )}
@@ -251,13 +304,13 @@ export const StudentDashboard: React.FC = () => {
               <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">Complaint Category</label>
               <select
                 required
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
+                value={newCategoryId || ''}
+                onChange={(e) => setNewCategoryId(Number(e.target.value))}
                 className="w-full bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-3 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
               >
                 <option value="">-- Choose Category --</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.name}>{cat.name}</option>
+                {activeCategories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>
             </div>
@@ -293,9 +346,10 @@ export const StudentDashboard: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-xs transition"
+              disabled={createTicket.isPending}
+              className="w-full bg-brand-primary hover:bg-brand-primary-hover disabled:opacity-50 text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-xs transition"
             >
-              Submit Ticket
+              {createTicket.isPending ? 'Submitting...' : 'Submit Ticket'}
             </button>
           </form>
         </div>
@@ -305,14 +359,24 @@ export const StudentDashboard: React.FC = () => {
       {activeTab === 'history' && (
         <div className="space-y-4 animate-fade-in">
           <h2 className="text-xl font-extrabold text-brand-text-main font-sans">Full Ticketing History</h2>
-          <TicketTable
-            tickets={tickets}
-            onViewDetails={(ticket) => {
-              setSelectedTicket(ticket);
-              setDetailModalOpen(true);
-            }}
-            showSubmitter={false}
-          />
+          {ticketsLoading ? (
+            <p className="text-xs italic text-brand-text-muted/60">Loading history logs...</p>
+          ) : tickets.length === 0 ? (
+            <EmptyState
+              title="No tickets found"
+              description="Your historical logs are empty. Let us know if you need any departmental support."
+              icon="folder"
+            />
+          ) : (
+            <TicketTable
+              tickets={tickets}
+              onViewDetails={(ticket) => {
+                setSelectedTicketId(ticket.id);
+                setDetailModalOpen(true);
+              }}
+              showSubmitter={false}
+            />
+          )}
         </div>
       )}
 
@@ -322,13 +386,13 @@ export const StudentDashboard: React.FC = () => {
           <div>
             <h2 className="text-xl font-extrabold text-brand-text-main font-sans">Student Identity</h2>
             <p className="text-xs text-brand-text-muted font-semibold mt-1">
-              Pre-verified registry parameters loaded for Stella Starr.
+              Pre-verified registry parameters loaded for {currentUser.name}.
             </p>
           </div>
 
           <div className="bg-brand-card border border-brand-border/40 p-6 sm:p-8 rounded-3xl shadow-sm flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8">
-            <div className="h-24 w-24 rounded-full bg-brand-primary border-2 border-brand-secondary/40 flex items-center justify-center font-bold text-brand-white text-3xl shadow-md shrink-0">
-              SS
+            <div className="h-24 w-24 rounded-full bg-brand-primary border-2 border-brand-secondary/40 flex items-center justify-center font-bold text-brand-white text-3xl shadow-md shrink-0 uppercase">
+              {currentUser.name.slice(0, 2)}
             </div>
             
             <div className="flex-1 w-full space-y-4">
@@ -343,7 +407,7 @@ export const StudentDashboard: React.FC = () => {
                 </div>
                 <div className="border-b border-brand-border/20 pb-2">
                   <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Registration Number</span>
-                  <span className="text-xs font-extrabold text-brand-primary">{currentUser.matricNo}</span>
+                  <span className="text-xs font-extrabold text-brand-primary">{currentUser.matricNo || 'N/A'}</span>
                 </div>
                 <div className="border-b border-brand-border/20 pb-2">
                   <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Registered Email</span>
@@ -356,7 +420,7 @@ export const StudentDashboard: React.FC = () => {
                 <div className="border-b border-brand-border/20 pb-2">
                   <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Verification Status</span>
                   <div>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-secondary/15 text-brand-secondary border border-brand-secondary/20">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-secondary/15 text-brand-secondary border border-brand-secondary/20">
                       Active Verified
                     </span>
                   </div>
@@ -392,6 +456,16 @@ export const StudentDashboard: React.FC = () => {
               </button>
             </div>
           </div>
+
+          {/* Logout Action */}
+          <div className="flex justify-end pt-4">
+            <button
+              onClick={logout}
+              className="text-xs font-extrabold text-red-600 hover:text-red-700 bg-red-500/10 border border-red-500/25 px-5 py-3 rounded-xl transition duration-155"
+            >
+              Sign Out from Session
+            </button>
+          </div>
         </div>
       )}
 
@@ -403,19 +477,19 @@ export const StudentDashboard: React.FC = () => {
             <div className="flex justify-between items-start border-b border-brand-border/30 pb-4">
               <div>
                 <span className="text-[10px] font-extrabold bg-brand-silver/10 px-2 py-0.5 rounded text-brand-text-muted uppercase">
-                  {selectedTicket.category}
+                  {selectedTicket.category_name || selectedTicket.category}
                 </span>
                 <h3 className="text-lg font-extrabold text-brand-text-main mt-2">
-                  {selectedTicket.id}: {selectedTicket.title}
+                  {selectedTicket.ticket_ref}: {selectedTicket.title}
                 </h3>
                 <p className="text-[10px] text-brand-text-muted font-bold mt-1">
-                  Submitted: {new Date(selectedTicket.date).toLocaleString()}
+                  Submitted: {new Date(selectedTicket.created_at || '').toLocaleString()}
                 </p>
               </div>
               <button
                 onClick={() => {
                   setDetailModalOpen(false);
-                  setSelectedTicket(null);
+                  setSelectedTicketId(null);
                 }}
                 className="text-brand-text-muted hover:text-brand-primary font-bold text-lg"
               >
@@ -432,11 +506,11 @@ export const StudentDashboard: React.FC = () => {
             </div>
 
             {/* Resolution */}
-            {selectedTicket.resolutionNote && (
+            {selectedTicket.resolution_notes && (
               <div className="space-y-2 bg-brand-primary/5 border border-brand-primary/30 p-4 rounded-xl">
                 <h4 className="text-xs font-bold text-brand-primary uppercase tracking-wider">Resolution note</h4>
                 <p className="text-xs text-brand-text-main font-bold leading-relaxed">
-                  {selectedTicket.resolutionNote}
+                  {selectedTicket.resolution_notes}
                 </p>
               </div>
             )}
@@ -446,17 +520,17 @@ export const StudentDashboard: React.FC = () => {
               <h4 className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Log &amp; Comment Threads</h4>
               
               <div className="space-y-3 max-h-48 overflow-y-auto pr-2 border-b border-brand-border/25 pb-4">
-                {selectedTicket.comments.length === 0 ? (
+                {!selectedTicket.comments || selectedTicket.comments.length === 0 ? (
                   <p className="text-xs italic text-brand-text-muted/50">No logs posted yet.</p>
                 ) : (
-                  selectedTicket.comments.map((c) => (
+                  selectedTicket.comments.map((c: any) => (
                     <div key={c.id} className="p-3 bg-brand-bg/30 border border-brand-border/20 rounded-xl space-y-1">
                       <div className="flex justify-between items-center text-[10px]">
                         <span className="font-extrabold text-brand-primary uppercase">
-                          {c.authorName} ({c.authorRole})
+                          {c.author_name || c.authorName} ({c.author_role || c.authorRole})
                         </span>
                         <span className="text-brand-text-muted font-bold">
-                          {new Date(c.date).toLocaleTimeString()}
+                          {new Date(c.created_at || c.date || '').toLocaleTimeString()}
                         </span>
                       </div>
                       <p className="text-xs text-brand-text-main font-semibold">{c.text}</p>
@@ -477,9 +551,10 @@ export const StudentDashboard: React.FC = () => {
                   />
                   <button
                     type="submit"
+                    disabled={addComment.isPending}
                     className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs"
                   >
-                    Send
+                    {addComment.isPending ? 'Sending...' : 'Send'}
                   </button>
                 </form>
               )}
@@ -501,9 +576,10 @@ export const StudentDashboard: React.FC = () => {
                     />
                     <button
                       onClick={() => handleCloseTicket(selectedTicket.id)}
-                      className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition"
+                      disabled={triggerFeedback.isPending}
+                      className="bg-brand-primary hover:bg-brand-primary-hover disabled:opacity-50 text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition"
                     >
-                      Accept &amp; Close
+                      {triggerFeedback.isPending ? 'Closing...' : 'Accept & Close'}
                     </button>
                   </div>
                 </div>
@@ -526,9 +602,10 @@ export const StudentDashboard: React.FC = () => {
                     />
                     <button
                       onClick={() => handleReopenTicket(selectedTicket.id)}
+                      disabled={triggerReopen.isPending}
                       className="bg-transparent border border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition"
                     >
-                      Reopen Ticket
+                      {triggerReopen.isPending ? 'Reopening...' : 'Reopen Ticket'}
                     </button>
                   </div>
                 </div>

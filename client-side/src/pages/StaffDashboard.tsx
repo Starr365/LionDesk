@@ -1,48 +1,79 @@
 import React, { useState, useEffect } from 'react';
-import { mockDb, Ticket } from '../services/mockDb';
+import { useAuthContext } from '../components/shared/AuthContext';
+import { useSocketContext } from '../components/shared/SocketContext';
+import { useTickets, Ticket } from '../hooks/useTickets';
 import { DashboardLayout } from '../components/shared/DashboardLayout';
 import { StatCard } from '../components/shared/StatCard';
 import { TicketTable } from '../components/shared/TicketTable';
+import { EmptyState } from '../components/shared/EmptyState';
 import { FiClipboard, FiUsers, FiClock, FiCheckCircle, FiUser } from 'react-icons/fi';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const StaffDashboard: React.FC = () => {
-  const currentUser = { id: 'usr-3', name: 'Dr. Charles Uzo', role: 'staff' as const, category: 'Academic', email: 'charles.uzo.staff@unn.edu.ng' };
+  const { user: currentUser, logout } = useAuthContext();
+  const { socket } = useSocketContext();
+  const queryClient = useQueryClient();
 
-  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [activeTab, setActiveTab] = useState('workload');
   
   // Modal detail view state
   const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+  const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
 
   // Form states
   const [resolutionNote, setResolutionNote] = useState('');
   const [resolutionError, setResolutionError] = useState('');
   const [commentText, setCommentText] = useState('');
 
-  const loadData = () => {
-    const staffTickets = mockDb.getTickets().filter((t) => t.staffId === currentUser.id);
-    setTickets(staffTickets);
+  // Hooks integration
+  const { useAssignedTickets, useTicketDetails, updateStatus, addComment } = useTickets();
+  const { data: tickets = [], isLoading: ticketsLoading } = useAssignedTickets();
+  const { data: selectedTicket } = useTicketDetails(selectedTicketId || 0);
 
-    if (selectedTicket) {
-      const updated = mockDb.getTicketById(selectedTicket.id);
-      if (updated) {
-        setSelectedTicket(updated);
-      }
-    }
-  };
-
+  // Socket sync
   useEffect(() => {
-    loadData();
-    window.addEventListener('mockDbUpdate', loadData);
-    return () => window.removeEventListener('mockDbUpdate', loadData);
-  }, [selectedTicket]);
+    if (!socket) return;
 
-  const handleStartWork = (ticketId: string) => {
-    mockDb.updateTicketStatus(ticketId, 'in_progress');
+    const handleTicketUpdate = () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets', 'assigned'] });
+      if (selectedTicketId) {
+        queryClient.invalidateQueries({ queryKey: ['tickets', 'detail', selectedTicketId] });
+      }
+    };
+
+    socket.on('ticket:created', handleTicketUpdate);
+    socket.on('ticket:status_changed', handleTicketUpdate);
+    socket.on('ticket:commented', handleTicketUpdate);
+    socket.on('ticket:reassigned', handleTicketUpdate);
+
+    return () => {
+      socket.off('ticket:created', handleTicketUpdate);
+      socket.off('ticket:status_changed', handleTicketUpdate);
+      socket.off('ticket:commented', handleTicketUpdate);
+      socket.off('ticket:reassigned', handleTicketUpdate);
+    };
+  }, [socket, selectedTicketId, queryClient]);
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-brand-bg flex items-center justify-center">
+        <p className="text-brand-text-muted font-bold animate-pulse">Verifying credentials...</p>
+      </div>
+    );
+  }
+
+  const handleStartWork = (ticketId: number) => {
+    updateStatus.mutate(
+      { id: ticketId, status: 'in_progress' },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['tickets', 'assigned'] });
+        }
+      }
+    );
   };
 
-  const handleResolveTicket = (e: React.FormEvent, ticketId: string) => {
+  const handleResolveTicket = (e: React.FormEvent, ticketId: number) => {
     e.preventDefault();
     setResolutionError('');
 
@@ -51,27 +82,33 @@ export const StaffDashboard: React.FC = () => {
       return;
     }
 
-    mockDb.updateTicketStatus(ticketId, 'resolved', {
-      resolutionNote: resolutionNote
-    });
-
-    setResolutionNote('');
-    setDetailModalOpen(false);
-    setSelectedTicket(null);
+    updateStatus.mutate(
+      { id: ticketId, status: 'resolved', resolution_notes: resolutionNote.trim() },
+      {
+        onSuccess: () => {
+          setResolutionNote('');
+          setDetailModalOpen(false);
+          setSelectedTicketId(null);
+        },
+        onError: (err: any) => {
+          setResolutionError(err.response?.data?.error || 'Failed to resolve ticket.');
+        }
+      }
+    );
   };
 
   const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!commentText.trim() || !selectedTicket) return;
+    if (!commentText.trim() || !selectedTicketId) return;
 
-    mockDb.addComment(selectedTicket.id, {
-      authorId: currentUser.id,
-      authorName: currentUser.name,
-      authorRole: 'staff',
-      text: commentText
-    });
-
-    setCommentText('');
+    addComment.mutate(
+      { id: selectedTicketId, text: commentText.trim() },
+      {
+        onSuccess: () => {
+          setCommentText('');
+        }
+      }
+    );
   };
 
   // Stats derivations
@@ -89,15 +126,15 @@ export const StaffDashboard: React.FC = () => {
   const sidebarTabs = [
     {
       id: 'workload',
-      name: 'My Workload',
+      name: 'Active Workload',
       icon: <FiClipboard className="h-4 w-4" />,
       onClick: () => setActiveTab('workload')
     },
     {
-      id: 'history',
-      name: 'History',
+      id: 'resolved',
+      name: 'Resolved Tickets',
       icon: <FiCheckCircle className="h-4 w-4" />,
-      onClick: () => setActiveTab('history')
+      onClick: () => setActiveTab('resolved')
     },
     {
       id: 'profile',
@@ -109,91 +146,94 @@ export const StaffDashboard: React.FC = () => {
 
   return (
     <DashboardLayout
-      roleName="Faculty Staff"
+      roleName="Staff Specialist"
       userName={currentUser.name}
       activeTab={activeTab}
       tabs={sidebarTabs}
       onAvatarClick={() => setActiveTab('profile')}
     >
-      {/* Title */}
-      <div>
-        <h1 className="text-xl sm:text-2xl font-extrabold text-brand-text-main font-sans">
-          Staff Hub &mdash; {currentUser.category}
-        </h1>
-        <p className="text-brand-text-muted text-xs font-semibold">
-          Handle academic complaints assigned to your workload queue.
-        </p>
-      </div>
-
-      {/* Tab 1: My Workload */}
+      {/* Tab 1: Active Workload */}
       {activeTab === 'workload' && (
         <div className="space-y-6 animate-fade-in">
-          {/* Stats row */}
+          {/* Welcome Banner */}
+          <div>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-brand-text-main font-sans">
+              Welcome back, {currentUser.name}
+            </h1>
+            <p className="text-brand-text-muted text-xs font-semibold mt-1">
+              You are assigned to the <strong className="text-brand-primary font-bold">{currentUser.category || 'Specialist'}</strong> category queue.
+            </p>
+          </div>
+
+          {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <StatCard
-              title="Active Queue"
+              title="Active Workload"
               value={activeWorkloadCount}
-              description="Needs reviews &amp; comments"
+              description="Open and in progress tickets"
               icon={<FiClock className="h-5 w-5" />}
             />
             <StatCard
               title="Resolved"
               value={resolvedCount}
-              description="Resolved or closed"
-              icon={<FiCheckCircle className="h-5 w-5" />}
-            />
-            <StatCard
-              title="Lifetime Assigned"
-              value={totalAssigned}
-              description="All-time workflow metrics"
-              icon={<FiUsers className="h-5 w-5" />}
-            />
-          </div>
-
-          <div className="space-y-4">
-            <h2 className="text-lg font-extrabold text-brand-text-main">My Active Queue</h2>
-            <TicketTable
-              tickets={activeWorkloadTickets}
-              onViewDetails={(ticket) => {
-                setSelectedTicket(ticket);
-                setDetailModalOpen(true);
-              }}
-              showAssignee={false}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Tab 2: History */}
-      {activeTab === 'history' && (
-        <div className="space-y-6 animate-fade-in">
-          {/* Stats row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <StatCard
-              title="Resolved Tickets"
-              value={resolvedCount}
-              description="Total complaints resolved"
+              description="Successfully completed tickets"
               icon={<FiCheckCircle className="h-5 w-5" />}
             />
             <StatCard
               title="Total Assigned"
               value={totalAssigned}
-              description="Total complaints allocated"
-              icon={<FiUsers className="h-5 w-5" />}
+              description="Lifetime ticket allocations"
+              icon={<FiClipboard className="h-5 w-5" />}
             />
           </div>
 
+          {/* Active Workload List */}
           <div className="space-y-4">
-            <h2 className="text-lg font-extrabold text-brand-text-main">Resolved History</h2>
+            <h2 className="text-lg font-extrabold text-brand-text-main">Currently Assigned Tickets</h2>
+            {ticketsLoading ? (
+              <p className="text-xs italic text-brand-text-muted/65">Loading workload...</p>
+            ) : activeWorkloadTickets.length === 0 ? (
+              <EmptyState
+                title="Your workload is clear!"
+                description="When new student complaints are submitted in your category, they will be auto-allocated here based on your workload count."
+                icon="inbox"
+              />
+            ) : (
+              <TicketTable
+                tickets={activeWorkloadTickets}
+                onViewDetails={(ticket) => {
+                  setSelectedTicketId(ticket.id);
+                  setDetailModalOpen(true);
+                }}
+                showAssignee={false}
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Tab 2: Resolved Workload History */}
+      {activeTab === 'resolved' && (
+        <div className="space-y-4 animate-fade-in">
+          <h2 className="text-xl font-extrabold text-brand-text-main font-sans">Resolved &amp; Closed Tickets</h2>
+          {ticketsLoading ? (
+            <p className="text-xs italic text-brand-text-muted/65">Loading history...</p>
+          ) : resolvedWorkloadTickets.length === 0 ? (
+            <EmptyState
+              title="No resolved tickets yet"
+              description="Once you resolve and close tickets, they will be saved here as history logs."
+              icon="folder"
+            />
+          ) : (
             <TicketTable
               tickets={resolvedWorkloadTickets}
               onViewDetails={(ticket) => {
-                setSelectedTicket(ticket);
+                setSelectedTicketId(ticket.id);
                 setDetailModalOpen(true);
               }}
               showAssignee={false}
             />
-          </div>
+          )}
         </div>
       )}
 
@@ -203,13 +243,13 @@ export const StaffDashboard: React.FC = () => {
           <div>
             <h2 className="text-xl font-extrabold text-brand-text-main font-sans">Specialist Identity</h2>
             <p className="text-xs text-brand-text-muted font-semibold mt-1">
-              Active departmental workload parameters loaded for {currentUser.name}.
+              Pre-verified registry parameters loaded for {currentUser.name}.
             </p>
           </div>
 
           <div className="bg-brand-card border border-brand-border/40 p-6 sm:p-8 rounded-3xl shadow-sm flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8">
-            <div className="h-24 w-24 rounded-full bg-brand-primary border-2 border-brand-secondary/40 flex items-center justify-center font-bold text-brand-white text-3xl shadow-md shrink-0">
-              CU
+            <div className="h-24 w-24 rounded-full bg-brand-primary border-2 border-brand-secondary/40 flex items-center justify-center font-bold text-brand-white text-3xl shadow-md shrink-0 uppercase">
+              {currentUser.name.slice(0, 2)}
             </div>
             
             <div className="flex-1 w-full space-y-4">
@@ -219,26 +259,26 @@ export const StaffDashboard: React.FC = () => {
                   <span className="text-xs font-extrabold text-brand-text-main">{currentUser.name}</span>
                 </div>
                 <div className="border-b border-brand-border/20 pb-2">
-                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Specialist Role</span>
-                  <span className="text-xs font-extrabold text-brand-text-main capitalize">{currentUser.role}</span>
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">System Access Role</span>
+                  <span className="text-xs font-extrabold text-brand-text-main capitalize">Staff Specialist</span>
                 </div>
                 <div className="border-b border-brand-border/20 pb-2">
-                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Specialty Category</span>
-                  <span className="text-xs font-extrabold text-brand-primary">{currentUser.category}</span>
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Specialist Category</span>
+                  <span className="text-xs font-extrabold text-brand-primary">{currentUser.category || 'Specialist'}</span>
                 </div>
                 <div className="border-b border-brand-border/20 pb-2">
-                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Official Email</span>
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Registered Email</span>
                   <span className="text-xs font-extrabold text-brand-text-main">{currentUser.email}</span>
                 </div>
                 <div className="border-b border-brand-border/20 pb-2">
-                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Department / School</span>
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Department / Institution</span>
                   <span className="text-xs font-extrabold text-brand-text-main">Computer Science, UNN</span>
                 </div>
                 <div className="border-b border-brand-border/20 pb-2">
-                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Account Status</span>
+                  <span className="text-[10px] font-bold text-brand-text-muted uppercase tracking-wider block">Specialist Status</span>
                   <div>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-secondary/15 text-brand-secondary border border-brand-secondary/20">
-                      Active Provisioned
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-secondary/15 text-brand-secondary border border-brand-secondary/20">
+                      Active duty
                     </span>
                   </div>
                 </div>
@@ -250,7 +290,7 @@ export const StaffDashboard: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="bg-brand-card border border-brand-border/40 p-5 rounded-2xl shadow-xs flex justify-between items-center">
               <div>
-                <span className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Active Queue workload</span>
+                <span className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Active Inquiries</span>
                 <h4 className="text-2xl font-extrabold text-brand-text-main mt-1">{activeWorkloadCount}</h4>
               </div>
               <button
@@ -262,41 +302,51 @@ export const StaffDashboard: React.FC = () => {
             </div>
             <div className="bg-brand-card border border-brand-border/40 p-5 rounded-2xl shadow-xs flex justify-between items-center">
               <div>
-                <span className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Resolved complaints</span>
+                <span className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Resolved Tickets</span>
                 <h4 className="text-2xl font-extrabold text-brand-text-main mt-1">{resolvedCount}</h4>
               </div>
               <button
-                onClick={() => setActiveTab('history')}
-                className="bg-transparent border border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-brand-white text-xs font-bold px-3 py-1.5 rounded-lg transition"
+                onClick={() => setActiveTab('resolved')}
+                className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-3 py-1.5 rounded-lg transition"
               >
                 View History
               </button>
             </div>
           </div>
+
+          {/* Logout Action */}
+          <div className="flex justify-end pt-4">
+            <button
+              onClick={logout}
+              className="text-xs font-extrabold text-red-600 hover:text-red-700 bg-red-500/10 border border-red-500/25 px-5 py-3 rounded-xl transition duration-155"
+            >
+              Sign Out from Session
+            </button>
+          </div>
         </div>
       )}
 
-      {/* Ticket Details Dialog (Overlay remains dynamic for updates) */}
+      {/* Detail Dialog Modal */}
       {detailModalOpen && selectedTicket && (
         <div className="fixed inset-0 bg-brand-primary/15 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-brand-card border border-brand-border/40 w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-start border-b border-brand-border/30 pb-4">
               <div>
-                <span className="text-[10px] font-extrabold bg-brand-silver/10 px-2 py-0.5 rounded text-brand-text-muted">
-                  STUDENT SUBMISSION
+                <span className="text-[10px] font-extrabold bg-brand-silver/10 px-2 py-0.5 rounded text-brand-text-muted uppercase">
+                  {selectedTicket.category_name || selectedTicket.category}
                 </span>
                 <h3 className="text-lg font-extrabold text-brand-text-main mt-2">
-                  {selectedTicket.id}: {selectedTicket.title}
+                  {selectedTicket.ticket_ref}: {selectedTicket.title}
                 </h3>
                 <p className="text-[10px] text-brand-text-muted font-bold mt-1">
-                  Filed By: {selectedTicket.studentName} | Submitted: {new Date(selectedTicket.date).toLocaleString()}
+                  Submitted: {new Date(selectedTicket.created_at || '').toLocaleString()} by {selectedTicket.student_name || selectedTicket.studentName}
                 </p>
               </div>
               <button
                 onClick={() => {
                   setDetailModalOpen(false);
-                  setSelectedTicket(null);
+                  setSelectedTicketId(null);
                 }}
                 className="text-brand-text-muted hover:text-brand-primary font-bold text-lg"
               >
@@ -306,58 +356,58 @@ export const StaffDashboard: React.FC = () => {
 
             {/* Description */}
             <div className="space-y-2">
-              <h4 className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Complaint text</h4>
+              <h4 className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Detailed Description</h4>
               <p className="text-xs bg-brand-bg/50 border border-brand-border/20 p-4 rounded-xl leading-relaxed text-brand-text-main font-semibold">
                 {selectedTicket.description}
               </p>
             </div>
 
-            {/* Reopen reason */}
-            {selectedTicket.reopenReason && (
-              <div className="p-4 bg-brand-primary/5 border border-brand-primary/30 rounded-xl space-y-1">
-                <h4 className="text-xs font-extrabold text-brand-primary uppercase tracking-wider">Reason for Reopening</h4>
-                <p className="text-xs text-brand-text-main font-bold">
-                  "{selectedTicket.reopenReason}"
+            {/* Resolution Display */}
+            {selectedTicket.resolution_notes && (
+              <div className="space-y-2 bg-brand-primary/5 border border-brand-primary/30 p-4 rounded-xl">
+                <h4 className="text-xs font-bold text-brand-primary uppercase tracking-wider">Resolution note</h4>
+                <p className="text-xs text-brand-text-main font-bold leading-relaxed">
+                  {selectedTicket.resolution_notes}
                 </p>
               </div>
             )}
 
-            {/* Student Feedback */}
+            {/* Student Feedback display */}
             {selectedTicket.feedback && (
-              <div className="p-4 bg-brand-silver/10 border border-brand-border/30 rounded-xl space-y-1">
-                <h4 className="text-xs font-bold text-brand-text-main uppercase tracking-wider">Student Feedback</h4>
-                <p className="text-xs text-brand-text-muted italic font-semibold">
+              <div className="space-y-2 bg-brand-secondary/5 border border-brand-secondary/30 p-4 rounded-xl">
+                <h4 className="text-xs font-bold text-brand-secondary uppercase tracking-wider">Student Feedback Remarks</h4>
+                <p className="text-xs italic text-brand-text-main font-bold leading-relaxed">
                   "{selectedTicket.feedback}"
                 </p>
               </div>
             )}
 
-            {/* Resolution note */}
-            {selectedTicket.resolutionNote && (
-              <div className="p-4 bg-brand-primary/5 border border-brand-primary/30 rounded-xl space-y-1">
-                <h4 className="text-xs font-bold text-brand-primary uppercase tracking-wider">Submitted Resolution</h4>
-                <p className="text-xs text-brand-text-main font-bold">
-                  {selectedTicket.resolutionNote}
+            {/* Student Reopen Reason display */}
+            {selectedTicket.reopen_reason && (
+              <div className="space-y-2 bg-red-500/5 border border-red-500/25 p-4 rounded-xl">
+                <h4 className="text-xs font-bold text-red-700 uppercase tracking-wider">Student Reopen Reason</h4>
+                <p className="text-xs text-brand-text-main font-bold leading-relaxed">
+                  {selectedTicket.reopen_reason}
                 </p>
               </div>
             )}
 
-            {/* Discussion timeline */}
+            {/* Comment logs */}
             <div className="space-y-4 pt-2">
-              <h4 className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Log &amp; Comments</h4>
+              <h4 className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Log &amp; Comment Threads</h4>
               
               <div className="space-y-3 max-h-48 overflow-y-auto pr-2 border-b border-brand-border/25 pb-4">
-                {selectedTicket.comments.length === 0 ? (
+                {!selectedTicket.comments || selectedTicket.comments.length === 0 ? (
                   <p className="text-xs italic text-brand-text-muted/50">No logs posted yet.</p>
                 ) : (
-                  selectedTicket.comments.map((c) => (
+                  selectedTicket.comments.map((c: any) => (
                     <div key={c.id} className="p-3 bg-brand-bg/30 border border-brand-border/20 rounded-xl space-y-1">
                       <div className="flex justify-between items-center text-[10px]">
                         <span className="font-extrabold text-brand-primary uppercase">
-                          {c.authorName} ({c.authorRole})
+                          {c.author_name || c.authorName} ({c.author_role || c.authorRole})
                         </span>
                         <span className="text-brand-text-muted font-bold">
-                          {new Date(c.date).toLocaleTimeString()}
+                          {new Date(c.created_at || c.date || '').toLocaleTimeString()}
                         </span>
                       </div>
                       <p className="text-xs text-brand-text-main font-semibold">{c.text}</p>
@@ -373,64 +423,60 @@ export const StaffDashboard: React.FC = () => {
                     required
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    placeholder="Write a comment..."
+                    placeholder="Add comments or reply to student..."
                     className="flex-1 bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-2 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
                   />
                   <button
                     type="submit"
-                    className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition"
+                    disabled={addComment.isPending}
+                    className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs"
                   >
-                    Post Log
+                    {addComment.isPending ? 'Sending...' : 'Send'}
                   </button>
                 </form>
               )}
             </div>
 
-            {/* Actions Workflow */}
-            {selectedTicket.status !== 'closed' && selectedTicket.status !== 'resolved' && (
-              <div className="border-t border-brand-border/30 pt-4 space-y-4">
-                {selectedTicket.status === 'open' && (
-                  <div className="flex items-center justify-between bg-brand-light/30 border border-brand-primary/20 p-4 rounded-xl">
-                    <div>
-                      <h4 className="text-xs font-bold text-brand-text-main">Claim this Ticket</h4>
-                      <p className="text-[10px] text-brand-text-muted font-semibold">Signal to the student that research has started.</p>
-                    </div>
-                    <button
-                      onClick={() => handleStartWork(selectedTicket.id)}
-                      className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-lg transition"
-                    >
-                      Start Work
-                    </button>
-                  </div>
-                )}
+            {/* Resolution Form actions */}
+            {selectedTicket.status === 'open' && (
+              <div className="pt-2">
+                <button
+                  onClick={() => handleStartWork(selectedTicket.id)}
+                  disabled={updateStatus.isPending}
+                  className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 rounded-xl shadow-xs transition"
+                >
+                  {updateStatus.isPending ? 'Starting...' : 'Acknowledge & Start Work'}
+                </button>
+              </div>
+            )}
 
-                {/* Resolve Box */}
-                <form onSubmit={(e) => handleResolveTicket(e, selectedTicket.id)} className="space-y-3">
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
-                      Resolution Note (Mandatory)
-                    </label>
-                    {resolutionError && (
-                      <p className="text-[10px] text-brand-primary font-bold">{resolutionError}</p>
-                    )}
-                    <textarea
+            {selectedTicket.status === 'in_progress' || selectedTicket.status === 'reopened' || selectedTicket.status === 'escalated' ? (
+              <div className="border-t border-brand-border/30 pt-4 space-y-4">
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold text-brand-primary uppercase tracking-wider">Resolve Complaint</h4>
+                  {resolutionError && (
+                    <p className="text-[10px] text-brand-primary font-bold">{resolutionError}</p>
+                  )}
+                  <form onSubmit={(e) => handleResolveTicket(e, selectedTicket.id)} className="flex gap-2">
+                    <input
+                      type="text"
                       required
                       value={resolutionNote}
                       onChange={(e) => setResolutionNote(e.target.value)}
-                      rows={3}
-                      placeholder="Detail exactly what was done to resolve the complaint..."
-                      className="w-full bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-3 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
+                      placeholder="Detail resolution steps taken (mandatory)..."
+                      className="flex-1 bg-brand-bg border border-brand-border/50 rounded-xl px-4 py-2 text-xs text-brand-text-main focus:outline-none focus:border-brand-primary font-semibold transition"
                     />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold py-3 rounded-xl shadow-xs transition"
-                  >
-                    Submit Resolution &amp; Resolve Ticket
-                  </button>
-                </form>
+                    <button
+                      type="submit"
+                      disabled={updateStatus.isPending}
+                      className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition"
+                    >
+                      {updateStatus.isPending ? 'Saving...' : 'Mark Resolved'}
+                    </button>
+                  </form>
+                </div>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       )}

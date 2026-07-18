@@ -10,6 +10,10 @@ import StaffDashboard from './pages/StaffDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Docs from './pages/Docs';
 
+// Provider contexts
+import { AuthProvider } from './components/shared/AuthContext';
+import { SocketProvider } from './components/shared/SocketContext';
+
 // Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,18 +27,22 @@ const queryClient = new QueryClient({
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/activate" element={<Activate />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/student" element={<StudentDashboard />} />
-          <Route path="/staff" element={<StaffDashboard />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/docs" element={<Docs />} />
-        </Routes>
-      </Router>
+      <AuthProvider>
+        <SocketProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/activate" element={<Activate />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/student" element={<StudentDashboard />} />
+              <Route path="/staff" element={<StaffDashboard />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/docs" element={<Docs />} />
+            </Routes>
+          </Router>
+        </SocketProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };

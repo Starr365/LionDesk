@@ -1,9 +1,24 @@
 import React from 'react';
-import { Ticket } from '../../services/mockDb';
+
+// Unified client-side Ticket interface matching both formats
+interface Ticket {
+  id: number;
+  ticket_ref: string;
+  title: string;
+  category?: string;
+  category_name?: string;
+  studentName?: string;
+  student_name?: string;
+  staffName?: string;
+  staff_name?: string;
+  status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened' | 'escalated';
+  created_at: string;
+  date?: string; // Fallback
+}
 
 interface TicketTableProps {
   tickets: Ticket[];
-  onViewDetails: (ticket: Ticket) => void;
+  onViewDetails: (ticket: any) => void;
   showAssignee?: boolean;
   showSubmitter?: boolean;
 }
@@ -86,26 +101,28 @@ export const TicketTable: React.FC<TicketTableProps> = ({
             <tbody className="divide-y divide-brand-border/20 text-sm font-semibold">
               {tickets.map((ticket) => (
                 <tr key={ticket.id} className="hover:bg-brand-bg/15 transition duration-150">
-                  <td className="py-4 px-6 text-brand-primary font-bold">{ticket.id}</td>
+                  <td className="py-4 px-6 text-brand-primary font-bold">{ticket.ticket_ref}</td>
                   <td className="py-4 px-6 text-brand-text-main max-w-xs truncate">
                     {ticket.title}
                   </td>
                   <td className="py-4 px-6">
                     <span className="text-xs font-bold bg-brand-silver/10 px-2 py-1 rounded-md text-brand-text-muted">
-                      {ticket.category}
+                      {ticket.category_name || ticket.category}
                     </span>
                   </td>
                   {showSubmitter && (
-                    <td className="py-4 px-6 text-brand-text-muted">{ticket.studentName}</td>
+                    <td className="py-4 px-6 text-brand-text-muted">
+                      {ticket.student_name || ticket.studentName}
+                    </td>
                   )}
                   {showAssignee && (
                     <td className="py-4 px-6 text-brand-text-muted">
-                      {ticket.staffName ? ticket.staffName : <span className="italic text-brand-text-muted/50">Unassigned</span>}
+                      {ticket.staff_name || ticket.staffName ? (ticket.staff_name || ticket.staffName) : <span className="italic text-brand-text-muted/50">Unassigned</span>}
                     </td>
                   )}
                   <td className="py-4 px-6">{getStatusBadge(ticket.status)}</td>
                   <td className="py-4 px-6 text-brand-text-muted text-xs">
-                    {new Date(ticket.date).toLocaleDateString(undefined, {
+                    {new Date(ticket.created_at || ticket.date || '').toLocaleDateString(undefined, {
                       month: 'short',
                       day: 'numeric',
                       hour: '2-digit',
@@ -132,14 +149,14 @@ export const TicketTable: React.FC<TicketTableProps> = ({
         {tickets.map((ticket) => (
           <div key={ticket.id} className="bg-brand-card border border-brand-border/40 p-5 rounded-2xl space-y-3 shadow-xs">
             <div className="flex justify-between items-center text-xs">
-              <span className="text-brand-primary font-bold">{ticket.id}</span>
+              <span className="text-brand-primary font-bold">{ticket.ticket_ref}</span>
               {getStatusBadge(ticket.status)}
             </div>
             
             <div className="space-y-1">
               <h4 className="text-xs font-bold text-brand-text-main leading-snug">{ticket.title}</h4>
               <p className="text-[10px] text-brand-text-muted font-bold">
-                {new Date(ticket.date).toLocaleDateString(undefined, {
+                {new Date(ticket.created_at || ticket.date || '').toLocaleDateString(undefined, {
                   month: 'short',
                   day: 'numeric',
                   hour: '2-digit',
@@ -150,14 +167,14 @@ export const TicketTable: React.FC<TicketTableProps> = ({
 
             <div className="flex flex-col gap-1 text-[10px] font-semibold text-brand-text-muted pt-2.5 border-t border-brand-border/20">
               <div className="flex justify-between">
-                <span>Category: <span className="text-brand-text-main font-bold">{ticket.category}</span></span>
+                <span>Category: <span className="text-brand-text-main font-bold">{ticket.category_name || ticket.category}</span></span>
                 {showSubmitter && (
-                  <span>Submitter: <span className="text-brand-text-main font-bold">{ticket.studentName}</span></span>
+                  <span>Submitter: <span className="text-brand-text-main font-bold">{ticket.student_name || ticket.studentName}</span></span>
                 )}
               </div>
               {showAssignee && (
                 <div>
-                  Assignee: <span className="text-brand-text-main font-bold">{ticket.staffName ? ticket.staffName : 'Unassigned'}</span>
+                  Assignee: <span className="text-brand-text-main font-bold">{ticket.staff_name || ticket.staffName ? (ticket.staff_name || ticket.staffName) : 'Unassigned'}</span>
                 </div>
               )}
             </div>
