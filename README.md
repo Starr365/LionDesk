@@ -70,7 +70,7 @@ Follow these step-by-step commands to get the system running locally in under 5 
 4.  Configure `.env` using these example variables:
     ```ini
     PORT=5000
-    JWT_SECRET=super_secret_liondesk_token_signature_key_2026
+    JWT_SECRET=super_secret
     RESEND_API_KEY=re_123456789abc_examplekey
     EMAIL_FROM=liondesk@unn.edu.ng
     DB_HOST=127.0.0.1

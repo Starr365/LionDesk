@@ -24,6 +24,7 @@ import { initSocket } from './services/socket.service.js';
 import { startEscalationCron } from './services/escalation.service.js';
 
 dotenv.config();
+dotenv.config({ path: '.env.local' });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -118,6 +119,8 @@ const startServer = async () => {
   });
 };
 
-startServer();
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}
 
 export default app;

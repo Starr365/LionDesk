@@ -1,6 +1,8 @@
 # Exclude PRDs as requested
 PRD.md
 HelpDesk_PRD_Group5.docx
+tech.md
+
 
 # Dependencies and build folders
 node_modules/
