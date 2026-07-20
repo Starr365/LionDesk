@@ -14,6 +14,7 @@ import Docs from './pages/Docs';
 import { AuthProvider } from './components/shared/AuthContext';
 import { SocketProvider } from './components/shared/SocketContext';
 import { Toaster } from 'react-hot-toast';
+import { ScrollToTop } from './components/shared/ScrollToTop';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -32,6 +33,7 @@ const App: React.FC = () => {
         <SocketProvider>
           <Toaster position="top-right" reverseOrder={false} />
           <Router>
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/activate" element={<Activate />} />
