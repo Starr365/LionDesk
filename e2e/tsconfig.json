@@ -7,11 +7,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
-    "paths": {
-      "*": ["../client-side/node_modules/*"]
-    }
+    "typeRoots": ["../client-side/node_modules/@types", "../client-side/node_modules"]
   },
   "include": ["**/*.ts"]
 }
