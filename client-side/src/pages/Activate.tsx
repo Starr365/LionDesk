@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { useAuthContext } from '../components/shared/AuthContext';
 
 const Activate: React.FC = () => {
+  const { login } = useAuthContext();
   const [step, setStep] = useState(1);
   const [matricNumber, setMatricNumber] = useState('');
   const [fullName, setFullName] = useState('');
@@ -65,10 +67,9 @@ const Activate: React.FC = () => {
         return;
       }
 
-      // Log in user by storing token
-      if (data.token) {
-        localStorage.setItem('jwt', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+      // Log in user by updating auth context state
+      if (data.token && data.user) {
+        login(data.token, data.user);
       }
       toast.success('Profile activated successfully! Welcome to LionDesk.');
       navigate('/student');

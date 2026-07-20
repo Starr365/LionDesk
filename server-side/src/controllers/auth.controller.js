@@ -46,10 +46,9 @@ export const verifyRegistry = async (req, res) => {
       return res.status(400).json({ error: 'The name provided does not match the official record for this registration number.' });
     }
 
-    // 4. Return success and registry email
+    // 4. Return success
     res.json({
-      message: 'Registration credentials verified successfully.',
-      email: record.email
+      message: 'Registration credentials verified successfully.'
     });
   } catch (error) {
     console.error('[Auth] Registry verification error:', error.message);
