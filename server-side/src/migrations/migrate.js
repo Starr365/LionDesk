@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
 dotenv.config();
+dotenv.config({ path: '.env.local' });
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -18,15 +19,19 @@ const runMigration = async () => {
   console.log(`[Migration] Connecting to MySQL at ${host}:${port} as ${user}...`);
 
   try {
+    const sslConfig = process.env.DB_SSL === 'true' || host.includes('tidbcloud.com')
+      ? { minVersion: 'TLSv1.2', rejectUnauthorized: true }
+      : undefined;
+
     // 1. Connect without database to ensure it exists
-    const connection = await mysql.createConnection({ host, port, user, password });
+    const connection = await mysql.createConnection({ host, port, user, password, ssl: sslConfig });
     
     console.log(`[Migration] Creating database "${dbName}" if it doesn't exist...`);
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
     await connection.end();
 
     // 2. Re-connect directly to the database
-    const dbConnection = await mysql.createConnection({ host, port, user, password, database: dbName, multipleStatements: true });
+    const dbConnection = await mysql.createConnection({ host, port, user, password, database: dbName, multipleStatements: true, ssl: sslConfig });
     console.log(`[Migration] Connected to database "${dbName}".`);
 
     // 3. Read and execute the SQL file

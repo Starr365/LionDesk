@@ -26,7 +26,6 @@ CREATE TABLE IF NOT EXISTS student_registry (
   id           INT AUTO_INCREMENT PRIMARY KEY,
   matric_no    VARCHAR(50) UNIQUE NOT NULL,
   full_name    VARCHAR(255) NOT NULL,
-  email        VARCHAR(255) NOT NULL,
   is_used      BOOLEAN DEFAULT FALSE
 );
 
@@ -99,10 +98,10 @@ INSERT IGNORE INTO categories (name, description, escalation_hours) VALUES
   ('Facility', 'Lab computers, power issues, projector repairs', 72);
 
 -- Seed: student registry (pre-verified students)
-INSERT IGNORE INTO student_registry (matric_no, full_name, email) VALUES
-  ('2021/240123', 'Chidi Egwu', 'chidi.egwu.student@unn.edu.ng'),
-  ('2022/240456', 'Stella Starr', 'stella.starr.student@unn.edu.ng'),
-  ('2023/240789', 'Nkem Okafor', 'nkem.okafor.student@unn.edu.ng');
+INSERT IGNORE INTO student_registry (matric_no, full_name) VALUES
+  ('2021/240123', 'Chidi Egwu'),
+  ('2022/240456', 'Stella Starr'),
+  ('2023/240789', 'Nkem Okafor');
 
 -- Seed: default admin user (password: admin123 — bcrypt hash)
 INSERT IGNORE INTO users (email, password, role, full_name, is_active) VALUES
