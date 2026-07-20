@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useAuthContext } from '../components/shared/AuthContext';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 const Activate: React.FC = () => {
   const { login } = useAuthContext();
   const [step, setStep] = useState(1);
+  const [showPassword, setShowPassword] = useState(false);
   const [matricNumber, setMatricNumber] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -193,14 +195,23 @@ const Activate: React.FC = () => {
                 <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
                   Create Password
                 </label>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl pl-4 pr-11 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-text-muted/80 hover:text-brand-primary transition focus:outline-none flex items-center justify-center"
+                  >
+                    {showPassword ? <FiEyeOff className="h-4.5 w-4.5" /> : <FiEye className="h-4.5 w-4.5" />}
+                  </button>
+                </div>
               </div>
 
               <div className="flex gap-3">

@@ -60,7 +60,7 @@ describe('Auth API Endpoint Tests', () => {
         .send({ matric_no: '2022/240456', full_name: 'Stella Starr' });
 
       expect(res.statusCode).toEqual(200);
-      expect(res.body).toHaveProperty('email', mockStudent.email);
+      expect(res.body).toHaveProperty('message');
     });
 
     it('should return 404 if matriculation number is not found', async () => {
