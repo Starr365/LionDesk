@@ -340,7 +340,7 @@ export const StaffDashboard: React.FC = () => {
                   {selectedTicket.ticket_ref}: {selectedTicket.title}
                 </h3>
                 <p className="text-[10px] text-brand-text-muted font-bold mt-1">
-                  Submitted: {new Date(selectedTicket.created_at || '').toLocaleString()} by {selectedTicket.student_name}
+                  Submitted: {new Date(selectedTicket.created_at || '').toLocaleString()} by {selectedTicket.student_name} ({selectedTicket.student_email || 'No email'} | Matric: {selectedTicket.student_matric || 'N/A'})
                 </p>
               </div>
               <button

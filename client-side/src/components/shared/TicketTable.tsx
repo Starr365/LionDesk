@@ -8,6 +8,8 @@ interface Ticket {
   category_name?: string;
   studentName?: string;
   student_name?: string;
+  student_email?: string;
+  student_matric?: string;
   staffName?: string | null;
   staff_name?: string | null;
   status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened' | 'escalated';

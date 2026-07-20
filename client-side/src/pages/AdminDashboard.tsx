@@ -649,7 +649,7 @@ export const AdminDashboard: React.FC = () => {
                   {selectedTicket.ticket_ref}: {selectedTicket.title}
                 </h3>
                 <p className="text-[10px] text-brand-text-muted font-bold mt-1">
-                  Filed By: {selectedTicket.student_name || selectedTicket.studentName} | Assigned Specialist: {selectedTicket.staff_name || selectedTicket.staffName || 'Unassigned'}
+                  Filed By: {selectedTicket.student_name || selectedTicket.studentName} ({selectedTicket.student_email || 'No email'} | Matric: {selectedTicket.student_matric || 'N/A'}) | Assigned Specialist: {selectedTicket.staff_name || selectedTicket.staffName || 'Unassigned'}
                 </p>
               </div>
               <button

@@ -31,7 +31,6 @@ const Activate: React.FC = () => {
         return;
       }
 
-      // Success -> Do NOT prefill the email input. User must type it themselves.
       setEmail('');
       setStep(2);
       toast.success('Registry details verified! Please enter your preferred email and password.');
@@ -129,8 +128,8 @@ const Activate: React.FC = () => {
               Student Activation
             </h2>
             <p className="text-sm text-brand-text-muted font-semibold leading-relaxed">
-              {step === 1 
-                ? 'Step 1: Enter your official registration details to verify registry records.' 
+              {step === 1
+                ? 'Step 1: Enter your official registration details to verify registry records.'
                 : 'Step 2: Enter your preferred email address and create a secure password.'}
             </p>
           </div>
