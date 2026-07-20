@@ -7,7 +7,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "typeRoots": ["../client-side/node_modules/@types", "../client-side/node_modules"]
+    "paths": {
+      "@playwright/test": ["../client-side/node_modules/@playwright/test"]
+    }
   },
   "include": ["**/*.ts"]
 }
