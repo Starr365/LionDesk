@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useAuthContext } from '../components/shared/AuthContext';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const { login: saveSession } = useAuthContext();
   const { login } = useAuth();
@@ -21,7 +23,7 @@ const Login: React.FC = () => {
         onSuccess: (data) => {
           if (data.token && data.user) {
             saveSession(data.token, data.user);
-            
+
             // Redirect based on role
             if (data.user.role === 'admin') {
               navigate('/admin');
@@ -129,14 +131,23 @@ const Login: React.FC = () => {
                   Having trouble in sign in?
                 </Link>
               </div>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl pl-4 pr-11 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-text-muted/80 hover:text-brand-primary transition focus:outline-none flex items-center justify-center"
+                >
+                  {showPassword ? <FiEyeOff className="h-4.5 w-4.5" /> : <FiEye className="h-4.5 w-4.5" />}
+                </button>
+              </div>
             </div>
 
             <button
@@ -152,19 +163,6 @@ const Login: React.FC = () => {
             <div className="h-px bg-brand-border/30 w-full" />
             <span className="px-3 shrink-0 uppercase tracking-widest text-[10px]">Or Sign in with</span>
             <div className="h-px bg-brand-border/30 w-full" />
-          </div>
-
-          {/* Social Sign-in grid */}
-          <div className="grid grid-cols-3 gap-3">
-            <button className="flex items-center justify-center space-x-1.5 py-2.5 px-3 border border-brand-border/50 hover:bg-brand-bg/40 rounded-xl transition text-[11px] font-bold text-brand-text-muted">
-              <span>Google</span>
-            </button>
-            <button className="flex items-center justify-center space-x-1.5 py-2.5 px-3 border border-brand-border/50 hover:bg-brand-bg/40 rounded-xl transition text-[11px] font-bold text-brand-text-muted">
-              <span>Apple ID</span>
-            </button>
-            <button className="flex items-center justify-center space-x-1.5 py-2.5 px-3 border border-brand-border/50 hover:bg-brand-bg/40 rounded-xl transition text-[11px] font-bold text-brand-text-muted">
-              <span>Facebook</span>
-            </button>
           </div>
 
           <div className="text-center text-xs text-brand-text-muted font-bold border-t border-brand-border/25 pt-4">
