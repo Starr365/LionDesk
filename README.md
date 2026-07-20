@@ -13,7 +13,11 @@ LionDesk is a premium, automated web-based ticketing platform built specifically
 ---
 
 ## ⚡ Key Features & Challenges
-LionDesk manages real-time ticketing workloads and automates complex routing transitions, solving the challenge of balancing staff allocations by auto-assigning incoming complaints to the specialist with the fewest active tickets in the matching category. Building this project was a lesson in implementing complex calendar computations—specifically calculating escalation thresholds based strictly on **2 business days** (excluding weekends)—and integrating Socket.IO events to trigger automatic TanStack Query cache invalidations so that dashboards update instantly without page reloads.
+*   **Load-Balanced Auto-Assignment**: Automatically routes incoming student complaints to the staff specialist with the fewest active tickets in the matching category, preventing staff overload.
+*   **2 Business-Day Escalation Engine**: Implements precise date arithmetic to escalate unresolved tickets to the HOD after exactly two business days (excluding weekends).
+*   **Real-Time State Synchronization**: Employs Socket.IO gateway triggers combined with TanStack Query to instantly refresh frontend dashboard widgets and views without page reloads.
+*   **Pre-Verified Split-Step Activation**: Checks matriculation registry records first, then allows students to set their custom login email and password, preventing invalid registrants.
+*   **Advanced Administrative Control Hub**: Empowers HODs to view ticket analytics, manage staff specialist workloads, adjust categories, and manually reassign tickets.
 
 ---
 
