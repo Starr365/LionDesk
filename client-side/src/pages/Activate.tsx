@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 const Activate: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -7,14 +8,12 @@ const Activate: React.FC = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Step 1: Verify matric number + official name
   const handleVerifyRegistry = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg('');
     setLoading(true);
 
     try {
@@ -27,18 +26,17 @@ const Activate: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        setErrorMsg(data.error || 'Verification failed. Please try again.');
+        toast.error(data.error || 'Verification failed. Please try again.');
         setLoading(false);
         return;
       }
 
-      // Success -> prefill email, move to step 2
-      if (data.email) {
-        setEmail(data.email);
-      }
+      // Success -> Do NOT prefill the email input. User must type it themselves.
+      setEmail('');
       setStep(2);
+      toast.success('Registry details verified! Please enter your preferred email and password.');
     } catch (err) {
-      setErrorMsg('Cannot connect to verification server. Please try again later.');
+      toast.error('Cannot connect to verification server. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -47,7 +45,6 @@ const Activate: React.FC = () => {
   // Step 2: Set password and finalize registration
   const handleFinalizeActivation = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg('');
     setLoading(true);
 
     try {
@@ -65,7 +62,7 @@ const Activate: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        setErrorMsg(data.error || 'Activation failed.');
+        toast.error(data.error || 'Activation failed.');
         return;
       }
 
@@ -74,9 +71,10 @@ const Activate: React.FC = () => {
         localStorage.setItem('jwt', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
       }
+      toast.success('Profile activated successfully! Welcome to LionDesk.');
       navigate('/student');
     } catch (err) {
-      setErrorMsg('Server connection failed. Try again.');
+      toast.error('Server connection failed. Try again.');
     } finally {
       setLoading(false);
     }
@@ -133,15 +131,9 @@ const Activate: React.FC = () => {
             <p className="text-sm text-brand-text-muted font-semibold leading-relaxed">
               {step === 1 
                 ? 'Step 1: Enter your official registration details to verify registry records.' 
-                : 'Step 2: Confirm your portal email and create a secure login password.'}
+                : 'Step 2: Enter your preferred email address and create a secure password.'}
             </p>
           </div>
-
-          {errorMsg && (
-            <div className="p-3.5 bg-red-500/10 border border-red-500/30 text-red-700 text-xs font-semibold rounded-xl text-center leading-relaxed">
-              {errorMsg}
-            </div>
-          )}
 
           {step === 1 ? (
             <form onSubmit={handleVerifyRegistry} className="space-y-4 pt-2">
@@ -214,7 +206,7 @@ const Activate: React.FC = () => {
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => { setStep(1); setErrorMsg(''); }}
+                  onClick={() => { setStep(1); }}
                   className="w-1/3 bg-transparent border border-brand-border/50 text-brand-text-muted hover:text-brand-text-main font-bold py-3.5 px-4 rounded-xl transition duration-200"
                 >
                   Back

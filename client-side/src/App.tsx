@@ -13,6 +13,7 @@ import Docs from './pages/Docs';
 // Provider contexts
 import { AuthProvider } from './components/shared/AuthContext';
 import { SocketProvider } from './components/shared/SocketContext';
+import { Toaster } from 'react-hot-toast';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -29,6 +30,7 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <SocketProvider>
+          <Toaster position="top-right" reverseOrder={false} />
           <Router>
             <Routes>
               <Route path="/" element={<LandingPage />} />
