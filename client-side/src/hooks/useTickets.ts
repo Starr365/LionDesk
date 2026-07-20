@@ -21,8 +21,6 @@ export interface Ticket {
   status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'escalated' | 'reopened';
   student_id: number;
   student_name?: string;
-  student_email?: string;
-  student_matric?: string;
   staff_id?: number | null;
   staff_name?: string | null;
   resolution_notes?: string | null;

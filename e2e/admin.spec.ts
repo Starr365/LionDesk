@@ -4,12 +4,14 @@ test.describe('Admin HOD Flow E2E Tests', () => {
   test('should login as admin and view full administrative control tabs', async ({ page }) => {
     // 1. Visit Login
     await page.goto('/login');
+    page.on('console', msg => console.log('BROWSER LOG:', msg.text()));
+    page.on('pageerror', err => console.log('BROWSER ERROR:', err.message));
     await page.fill('input[type="email"]', 'hod.cs@unn.edu.ng');
     await page.fill('input[type="password"]', 'admin123');
     await page.click('button[type="submit"]');
 
-    // 2. Confirm HOD controls display
-    await expect(page.locator('text=HOD Administrative Controls')).toBeVisible();
+    // 2. Confirm HOD controls display (with increased loading timeout for remote DB query response)
+    await expect(page.locator('text=HOD Administrative Controls')).toBeVisible({ timeout: 15000 });
     await expect(page.locator('text=All Tickets')).toBeVisible();
 
     // 3. Navigate to Manage Staff tab

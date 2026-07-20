@@ -8,8 +8,6 @@ interface Ticket {
   category_name?: string;
   studentName?: string;
   student_name?: string;
-  student_email?: string;
-  student_matric?: string;
   staffName?: string | null;
   staff_name?: string | null;
   status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened' | 'escalated';
@@ -153,7 +151,7 @@ export const TicketTable: React.FC<TicketTableProps> = ({
               <span className="text-brand-primary font-bold">{ticket.ticket_ref}</span>
               {getStatusBadge(ticket.status)}
             </div>
-            
+
             <div className="space-y-1">
               <h4 className="text-xs font-bold text-brand-text-main leading-snug">{ticket.title}</h4>
               <p className="text-[10px] text-brand-text-muted font-bold">

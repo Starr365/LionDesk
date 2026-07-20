@@ -15,7 +15,7 @@ export const StaffDashboard: React.FC = () => {
   const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState('workload');
-  
+
   // Modal detail view state
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
@@ -251,7 +251,7 @@ export const StaffDashboard: React.FC = () => {
             <div className="h-24 w-24 rounded-full bg-brand-primary border-2 border-brand-secondary/40 flex items-center justify-center font-bold text-brand-white text-3xl shadow-md shrink-0 uppercase">
               {currentUser.name.slice(0, 2)}
             </div>
-            
+
             <div className="flex-1 w-full space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="border-b border-brand-border/20 pb-2">
@@ -340,7 +340,7 @@ export const StaffDashboard: React.FC = () => {
                   {selectedTicket.ticket_ref}: {selectedTicket.title}
                 </h3>
                 <p className="text-[10px] text-brand-text-muted font-bold mt-1">
-                  Submitted: {new Date(selectedTicket.created_at || '').toLocaleString()} by {selectedTicket.student_name} ({selectedTicket.student_email || 'No email'} | Matric: {selectedTicket.student_matric || 'N/A'})
+                  Submitted: {new Date(selectedTicket.created_at || '').toLocaleString()} by {selectedTicket.student_name}
                 </p>
               </div>
               <button
@@ -395,7 +395,7 @@ export const StaffDashboard: React.FC = () => {
             {/* Comment logs */}
             <div className="space-y-4 pt-2">
               <h4 className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Log &amp; Comment Threads</h4>
-              
+
               <div className="space-y-3 max-h-48 overflow-y-auto pr-2 border-b border-brand-border/25 pb-4">
                 {!selectedTicket.comments || selectedTicket.comments.length === 0 ? (
                   <p className="text-xs italic text-brand-text-muted/50">No logs posted yet.</p>

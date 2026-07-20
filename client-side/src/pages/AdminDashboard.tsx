@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { mockDb, Ticket, Category, User, STUDENT_REGISTRY } from '../services/mockDb';
 import { DashboardLayout } from '../components/shared/DashboardLayout';
 import { StatCard } from '../components/shared/StatCard';
 import { TicketTable } from '../components/shared/TicketTable';
 import { EmptyState } from '../components/shared/EmptyState';
 import { FiInbox, FiUsers, FiSettings, FiShield, FiBarChart2, FiFolder, FiActivity, FiAlertTriangle } from 'react-icons/fi';
 import { useQueryClient } from '@tanstack/react-query';
+import { useAuthContext } from '../components/shared/AuthContext';
+import { useSocketContext } from '../components/shared/SocketContext';
+import { useTickets } from '../hooks/useTickets';
+import { useCategories } from '../hooks/useCategories';
+import { useStaff } from '../hooks/useStaff';
 
 export const AdminDashboard: React.FC = () => {
   const { user: currentUser } = useAuthContext();
@@ -649,7 +653,7 @@ export const AdminDashboard: React.FC = () => {
                   {selectedTicket.ticket_ref}: {selectedTicket.title}
                 </h3>
                 <p className="text-[10px] text-brand-text-muted font-bold mt-1">
-                  Filed By: {selectedTicket.student_name || selectedTicket.studentName} ({selectedTicket.student_email || 'No email'} | Matric: {selectedTicket.student_matric || 'N/A'}) | Assigned Specialist: {selectedTicket.staff_name || selectedTicket.staffName || 'Unassigned'}
+                  Filed By: {selectedTicket.student_name} ({selectedTicket.student_email || 'No email'} | Matric: {selectedTicket.student_matric || 'N/A'}) | Assigned Specialist: {selectedTicket.staff_name || 'Unassigned'}
                 </p>
               </div>
               <button

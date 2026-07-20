@@ -102,11 +102,10 @@ export const getMyTickets = async (req, res) => {
 export const getAssignedTickets = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT t.*, c.name AS category_name, s.full_name AS student_name, s.email AS student_email, stud.matric_no AS student_matric
+      `SELECT t.*, c.name AS category_name, s.full_name AS student_name
        FROM tickets t
        JOIN categories c ON t.category_id = c.id
        JOIN users s ON t.student_id = s.id
-       LEFT JOIN students stud ON s.id = stud.user_id
        WHERE t.staff_id = ?
        ORDER BY t.created_at DESC`,
       [req.user.id]
@@ -124,11 +123,10 @@ export const getAssignedTickets = async (req, res) => {
 export const getAllTickets = async (req, res) => {
   try {
     const { status, category_id } = req.query;
-    let query = `SELECT t.*, c.name AS category_name, s.full_name AS student_name, s.email AS student_email, stud.matric_no AS student_matric, st.full_name AS staff_name
+    let query = `SELECT t.*, c.name AS category_name, s.full_name AS student_name, st.full_name AS staff_name
                  FROM tickets t
                  JOIN categories c ON t.category_id = c.id
                  JOIN users s ON t.student_id = s.id
-                 LEFT JOIN students stud ON s.id = stud.user_id
                  LEFT JOIN users st ON t.staff_id = st.id`;
     const params = [];
     const conditions = [];
@@ -153,11 +151,10 @@ export const getAllTickets = async (req, res) => {
 export const getTicketById = async (req, res) => {
   try {
     const [tickets] = await pool.query(
-      `SELECT t.*, c.name AS category_name, s.full_name AS student_name, s.email AS student_email, stud.matric_no AS student_matric, st.full_name AS staff_name
+      `SELECT t.*, c.name AS category_name, s.full_name AS student_name, st.full_name AS staff_name
        FROM tickets t
        JOIN categories c ON t.category_id = c.id
        JOIN users s ON t.student_id = s.id
-       LEFT JOIN students stud ON s.id = stud.user_id
        LEFT JOIN users st ON t.staff_id = st.id
        WHERE t.id = ?`,
       [req.params.id]
