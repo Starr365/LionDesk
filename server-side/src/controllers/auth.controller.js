@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { pool } from '../config/db.js';
 import { validateEmail, validatePassword } from '../utils/validators.js';
+import { sendPasswordResetEmail } from '../services/email.service.js';
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -10,6 +11,16 @@ const generateToken = (user) => {
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
   );
+};
+
+const setAuthCookie = (res, token) => {
+  const isProd = process.env.NODE_ENV === 'production';
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'None' : 'Lax',
+    maxAge: 8 * 60 * 60 * 1000 // 8 hours
+  });
 };
 
 /**
@@ -123,6 +134,9 @@ export const activate = async (req, res) => {
     const user = { id: userResult.insertId, role: 'student', full_name: record.full_name, email };
     const token = generateToken(user);
 
+    // Set cookie-based authentication
+    setAuthCookie(res, token);
+
     res.status(201).json({
       message: 'Account activated successfully.',
       token,
@@ -181,6 +195,9 @@ export const login = async (req, res) => {
       if (staffRows.length > 0) profile.category = staffRows[0].category;
     }
 
+    // Set cookie-based authentication
+    setAuthCookie(res, token);
+
     res.json({ token, user: profile });
   } catch (error) {
     console.error('[Auth] Login error:', error.message);
@@ -190,7 +207,7 @@ export const login = async (req, res) => {
 
 /**
  * POST /api/auth/forgot-password
- * Request a password reset. Stores a hashed token on the user record.
+ * Request a password reset. Stores a hashed 6-digit numeric recovery code.
  */
 export const forgotPassword = async (req, res) => {
   try {
@@ -204,20 +221,22 @@ export const forgotPassword = async (req, res) => {
     const [users] = await pool.query(`SELECT id FROM users WHERE email = ?`, [email]);
 
     if (users.length > 0) {
-      const resetToken = crypto.randomBytes(32).toString('hex');
-      const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-      const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+      // Generate a 6-digit numeric recovery code
+      const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const hashedToken = crypto.createHash('sha256').update(resetCode).digest('hex');
+      const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes expiration
 
       await pool.query(
         `UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?`,
         [hashedToken, expires, users[0].id]
       );
 
-      // TODO: Send email via Resend with the resetToken (not the hashed one)
-      console.log(`[Auth] Password reset token for ${email}: ${resetToken}`);
+      // Send email via Resend
+      await sendPasswordResetEmail(email, resetCode);
+      console.log(`[Auth] Password reset 6-digit code for ${email}: ${resetCode}`);
     }
 
-    res.json({ message: 'If an account with that email exists, a reset link has been sent.' });
+    res.json({ message: 'If an account with that email exists, a 6-digit recovery code has been sent.' });
   } catch (error) {
     console.error('[Auth] Forgot password error:', error.message);
     res.status(500).json({ error: 'Server error.' });
@@ -226,20 +245,20 @@ export const forgotPassword = async (req, res) => {
 
 /**
  * POST /api/auth/reset-password
- * Reset password using a valid token.
+ * Reset password using a valid 6-digit numeric recovery code.
  */
 export const resetPassword = async (req, res) => {
   try {
     const { token, new_password } = req.body;
 
     if (!token || !new_password) {
-      return res.status(400).json({ error: 'Token and new password are required.' });
+      return res.status(400).json({ error: 'Recovery code and new password are required.' });
     }
     if (!validatePassword(new_password)) {
       return res.status(400).json({ error: 'Password must be at least 6 characters.' });
     }
 
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    const hashedToken = crypto.createHash('sha256').update(token.trim()).digest('hex');
 
     const [users] = await pool.query(
       `SELECT id FROM users WHERE reset_token = ? AND reset_token_expires > NOW()`,
@@ -247,7 +266,7 @@ export const resetPassword = async (req, res) => {
     );
 
     if (users.length === 0) {
-      return res.status(400).json({ error: 'Invalid or expired reset token.' });
+      return res.status(400).json({ error: 'Invalid or expired recovery code.' });
     }
 
     const hashedPassword = await bcrypt.hash(new_password, 10);
@@ -262,4 +281,18 @@ export const resetPassword = async (req, res) => {
     console.error('[Auth] Reset password error:', error.message);
     res.status(500).json({ error: 'Server error.' });
   }
+};
+
+/**
+ * POST /api/auth/logout
+ * Logs out user by clearing the HTTP-Only auth cookie.
+ */
+export const logout = async (req, res) => {
+  const isProd = process.env.NODE_ENV === 'production';
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'None' : 'Lax'
+  });
+  res.json({ message: 'Logged out successfully.' });
 };

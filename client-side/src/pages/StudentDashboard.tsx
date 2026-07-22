@@ -539,7 +539,7 @@ export const StudentDashboard: React.FC = () => {
               </div>
 
               {selectedTicket.status !== 'closed' && selectedTicket.status !== 'resolved' && (
-                <form onSubmit={handleAddComment} className="flex gap-2">
+                <form onSubmit={handleAddComment} className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     required
@@ -551,7 +551,7 @@ export const StudentDashboard: React.FC = () => {
                   <button
                     type="submit"
                     disabled={addComment.isPending}
-                    className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs"
+                    className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {addComment.isPending ? 'Sending...' : 'Send'}
                   </button>
@@ -565,7 +565,7 @@ export const StudentDashboard: React.FC = () => {
                 {/* Accept & Close */}
                 <div className="space-y-2">
                   <h4 className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Close complaint with feedback</h4>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <input
                       type="text"
                       value={feedbackText}
@@ -576,7 +576,7 @@ export const StudentDashboard: React.FC = () => {
                     <button
                       onClick={() => handleCloseTicket(selectedTicket.id)}
                       disabled={triggerFeedback.isPending}
-                      className="bg-brand-primary hover:bg-brand-primary-hover disabled:opacity-50 text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition"
+                      className="bg-brand-primary hover:bg-brand-primary-hover disabled:opacity-50 disabled:cursor-not-allowed text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition"
                     >
                       {triggerFeedback.isPending ? 'Closing...' : 'Accept & Close'}
                     </button>
@@ -591,7 +591,7 @@ export const StudentDashboard: React.FC = () => {
                   {reopenError && (
                     <p className="text-[10px] text-brand-primary font-bold">{reopenError}</p>
                   )}
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <input
                       type="text"
                       value={reopenReason}
@@ -602,7 +602,7 @@ export const StudentDashboard: React.FC = () => {
                     <button
                       onClick={() => handleReopenTicket(selectedTicket.id)}
                       disabled={triggerReopen.isPending}
-                      className="bg-transparent border border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition"
+                      className="bg-transparent border border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-brand-white disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold px-4 py-2 rounded-xl transition"
                     >
                       {triggerReopen.isPending ? 'Reopening...' : 'Reopen Ticket'}
                     </button>
