@@ -25,8 +25,8 @@ export const Hero: React.FC = () => {
     <section ref={heroRef} className="relative overflow-hidden pt-36 pb-20 md:pt-48 md:pb-28">
       {/* Background gradients (soft overlay for light theme) */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none -z-10">
-        <div className="absolute top-12 left-1/4 w-[400px] h-[400px] bg-brand-primary/5 rounded-full blur-[120px]" />
-        <div className="absolute top-24 right-1/4 w-[350px] h-[350px] bg-brand-light/10 rounded-full blur-[120px]" />
+        <div className="absolute top-12 left-1/4 w-100 h-100 bg-brand-primary/5 rounded-full blur-[120px]" />
+        <div className="absolute top-24 right-1/4 w-87.5 h-87.5 bg-brand-light/10 rounded-full blur-[120px]" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 flex flex-col items-center text-center space-y-8 md:space-y-12">

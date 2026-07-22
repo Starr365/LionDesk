@@ -8,7 +8,7 @@ LionDesk is a premium, automated web-based ticketing platform built specifically
 *   **Frontend**: React with TypeScript, Vite, Tailwind CSS v4, TanStack Query (server state synchronization & caching).
 *   **Backend**: Node.js with Express.js, Socket.IO (instant WebSocket updates).
 *   **Database**: MySQL (relational schema with key-constraint bindings and ACID transaction guarantees).
-*   **Services**: Resend API (email notifications), Swagger UI (REST documentation at `/api-docs/`), node-cron (hourly automated business-day escalation checking), D3.js (animated admin reports), GSAP & ScrollTrigger (premium Landing Page motion).
+*   **Services**: Resend API (email notifications), Swagger UI (REST documentation at `/api-docs/`), node-cron (hourly automated business-day escalation checking), D3.js (animated admin charts), GSAP & ScrollTrigger (premium Landing Page motion).
 *   **Session Security**: HTTP-Only cookies for browser authentication, with a fallback `Authorization: Bearer` header check for programmatic API and WebSocket clients.
 
 ---

@@ -128,7 +128,7 @@ export const D3PieChart: React.FC<{ data: PieData[] }> = ({ data }) => {
       .attr('class', 'arc');
 
     arcs.append('path')
-      .attr('fill', (d, i) => colors[i % colors.length])
+      .attr('fill', (_, i) => colors[i % colors.length])
       .attr('d', arc)
       .each(function (d) {
         (this as any)._current = d;
