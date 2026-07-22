@@ -11,11 +11,15 @@ export const Hero: React.FC = () => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      tl.fromTo('.hero-badge', { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.6 })
-        .fromTo('.hero-title', { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.45')
-        .fromTo('.hero-desc', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7 }, '-=0.5')
-        .fromTo('.hero-actions', { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.6 }, '-=0.5')
-        .fromTo('.hero-mockup', { opacity: 0, scale: 0.96, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 1.0 }, '-=0.45');
+      tl.fromTo('.hero-badge', { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.7 })
+        .fromTo('.hero-title', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.9 }, '-=0.5')
+        .fromTo('.hero-desc', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.55')
+        .fromTo('.hero-actions', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7 }, '-=0.5')
+        .fromTo('.hero-mockup', 
+          { opacity: 0, scale: 0.92, y: 80, rotateX: 12, transformPerspective: 1000 }, 
+          { opacity: 1, scale: 1, y: 0, rotateX: 0, duration: 1.3, ease: 'power4.out' }, 
+          '-=0.5'
+        );
     }, heroRef);
 
     return () => ctx.revert();
