@@ -44,7 +44,7 @@ graph TD
 
 ## ⚙️ Technical Decisions
 
-### 1. MySQL 8 (Relational) vs. MongoDB (NoSQL)
+### 1. MySQL (Relational) vs. MongoDB (NoSQL)
 We selected MySQL because LionDesk relies on strict relational logic: tickets must map directly to registered students, staff members, and category tables. Using foreign key constraints (`ON DELETE RESTRICT`, `ON UPDATE CASCADE`) guarantees referential integrity, preventing orphans, while SQL transactions ensure that status updates, history comments, and staff workload recalculations execute atomically under strict ACID guarantees.
 
 ### 2. JWT Authentication via Secure HTTP-Only Cookies

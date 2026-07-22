@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 const ResetPassword: React.FC = () => {
-  const [code, setCode] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -13,11 +13,42 @@ const ResetPassword: React.FC = () => {
   const { resetPassword } = useAuth();
   const navigate = useNavigate();
 
+  const handleOtpChange = (value: string, index: number) => {
+    if (value && isNaN(Number(value))) return; // only numbers
+    const newOtp = [...otp];
+    newOtp[index] = value.substring(value.length - 1); // get last character
+    setOtp(newOtp);
+
+    // Focus next input if value is entered
+    if (value && index < 5) {
+      const nextInput = document.getElementById(`otp-${index + 1}`);
+      nextInput?.focus();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      const prevInput = document.getElementById(`otp-${index - 1}`);
+      prevInput?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasteData = e.clipboardData.getData('text').trim();
+    if (pasteData.length === 6 && !isNaN(Number(pasteData))) {
+      const digits = pasteData.split('');
+      setOtp(digits);
+      // Focus the last input
+      document.getElementById('otp-5')?.focus();
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+    const code = otp.join('');
 
-    if (code.trim().length !== 6 || isNaN(Number(code))) {
+    if (code.length !== 6) {
       setErrorMsg('Please enter a valid 6-digit numeric recovery code.');
       return;
     }
@@ -33,7 +64,7 @@ const ResetPassword: React.FC = () => {
     }
 
     resetPassword.mutate(
-      { token: code.trim(), new_password: newPassword },
+      { token: code, new_password: newPassword },
       {
         onSuccess: () => {
           toast.success('Password updated successfully! Please log in.');
@@ -87,19 +118,26 @@ const ResetPassword: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-            <div className="space-y-1">
-              <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
-                6-Digit Recovery Code
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider text-center">
+                6-Digit Recovery Code (OTP)
               </label>
-              <input
-                type="text"
-                required
-                maxLength={6}
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="Enter 6-digit recovery code"
-                className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium tracking-widest text-center transition"
-              />
+              <div className="flex justify-between gap-2 max-w-xs mx-auto py-2">
+                {otp.map((digit, idx) => (
+                  <input
+                    key={idx}
+                    id={`otp-${idx}`}
+                    type="text"
+                    required
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(e.target.value, idx)}
+                    onKeyDown={(e) => handleKeyDown(e, idx)}
+                    onPaste={handlePaste}
+                    className="w-12 h-12 text-center text-lg font-extrabold bg-brand-bg/40 border border-brand-border/50 rounded-xl text-brand-text-main focus:outline-none focus:border-brand-primary transition focus:ring-2 focus:ring-brand-primary/20"
+                  />
+                ))}
+              </div>
             </div>
 
             <div className="space-y-1">
