@@ -34,7 +34,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text-main flex flex-col font-sans">
       {/* Top Header Bar */}
-      <header className="h-16 bg-brand-card border-b border-brand-border/40 fixed top-0 left-0 w-full z-30 flex items-center justify-between px-6">
+      <header className="h-16 bg-brand-card border-b border-brand-border/40 fixed top-0 left-0 w-full z-55 flex items-center justify-between px-6">
         <div className="flex items-center space-x-4">
           {/* Mobile hamburger */}
           <button
@@ -103,7 +103,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         {mobileMenuOpen && (
           <>
             <div
-              className="fixed inset-0 bg-brand-primary/10 backdrop-blur-xs z-40 md:hidden"
+              className="fixed inset-0 top-16 bg-brand-primary/10 backdrop-blur-xs z-40 md:hidden"
               onClick={() => setMobileMenuOpen(false)}
             />
             <aside className="w-60 bg-brand-card border-r border-brand-border/40 fixed left-0 top-16 h-[calc(100vh-64px)] z-50 md:hidden animate-slide-in">
