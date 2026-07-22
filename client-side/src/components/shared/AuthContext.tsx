@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import api from '../../services/api';
 
 export interface UserProfile {
   id: string | number;
@@ -14,7 +15,7 @@ interface AuthContextType {
   user: UserProfile | null;
   token: string | null;
   login: (token: string, user: UserProfile) => void;
-  logout: () => void;
+  logout: () => void | Promise<void>;
   loading: boolean;
 }
 
@@ -48,7 +49,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(newUser);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await api.post('/api/auth/logout');
+    } catch (error) {
+      console.warn('[AuthContext] Logout endpoint error:', error);
+    }
     localStorage.removeItem('jwt');
     localStorage.removeItem('user');
     setToken(null);

@@ -1,41 +1,46 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
-import { useAuthContext } from '../components/shared/AuthContext';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 
-const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const ResetPassword: React.FC = () => {
+  const [code, setCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const { login: saveSession } = useAuthContext();
-  const { login } = useAuth();
+  const { resetPassword } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
-    login.mutate(
-      { email: email.trim(), password },
-      {
-        onSuccess: (data) => {
-          if (data.token && data.user) {
-            saveSession(data.token, data.user);
+    if (code.trim().length !== 6 || isNaN(Number(code))) {
+      setErrorMsg('Please enter a valid 6-digit numeric recovery code.');
+      return;
+    }
 
-            // Redirect based on role
-            if (data.user.role === 'admin') {
-              navigate('/admin');
-            } else if (data.user.role === 'staff') {
-              navigate('/staff');
-            } else {
-              navigate('/student');
-            }
-          }
+    if (newPassword.length < 6) {
+      setErrorMsg('New password must be at least 6 characters long.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setErrorMsg('Passwords do not match.');
+      return;
+    }
+
+    resetPassword.mutate(
+      { token: code.trim(), new_password: newPassword },
+      {
+        onSuccess: () => {
+          toast.success('Password updated successfully! Please log in.');
+          navigate('/login');
         },
         onError: (err: any) => {
-          const errMsg = err.response?.data?.error || 'Invalid credentials or connection error.';
+          const errMsg = err.response?.data?.error || 'Invalid recovery code or connection issue.';
           setErrorMsg(errMsg);
         }
       }
@@ -44,33 +49,12 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text-main flex flex-col justify-between p-6 relative overflow-hidden font-sans">
-      {/* Decorative Line Art Illustrations (as seen in the design inspiration) */}
+      {/* Decorative Line Art Illustrations */}
       <div className="absolute top-1/4 left-8 md:left-24 hidden lg:block opacity-60 pointer-events-none">
         <svg width="220" height="200" viewBox="0 0 220 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* Scribble line detail */}
           <path d="M10 80 Q 50 10, 100 80 T 190 80" stroke="#004d26" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-          {/* Mock document border */}
           <rect x="30" y="100" width="130" height="80" rx="6" stroke="#b9c0c3" strokeWidth="2" strokeDasharray="4 4" fill="none" />
-          <line x1="50" y1="125" x2="120" y2="125" stroke="#b9c0c3" strokeWidth="2" />
-          <line x1="50" y1="145" x2="100" y2="145" stroke="#b9c0c3" strokeWidth="2" />
           <circle cx="145" cy="120" r="4" fill="#00FF87" />
-        </svg>
-      </div>
-
-      <div className="absolute bottom-1/4 right-8 md:right-20 hidden lg:flex flex-col items-center opacity-70 pointer-events-none">
-        {/* Desk worker line art */}
-        <svg width="280" height="240" viewBox="0 0 280 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* Laptop */}
-          <path d="M40 180 L110 180 L125 155 L65 155 Z" fill="none" stroke="#004d26" strokeWidth="2.5" />
-          {/* Student outline sitting */}
-          <path d="M150 200 C150 160, 130 140, 115 130 L115 90 C115 90, 125 90, 130 85 C135 80, 135 70, 130 65 C125 60, 115 65, 110 70 L100 85 L90 120 C90 120, 80 145, 95 155" stroke="#004d26" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-          {/* Solid stand pedestal block (spotted design matching inspo) */}
-          <rect x="135" y="175" width="65" height="60" fill="none" stroke="#004d26" strokeWidth="2.5" rx="4" />
-          <circle cx="150" cy="195" r="3" fill="#004d26" />
-          <circle cx="165" cy="210" r="3" fill="#004d26" />
-          <circle cx="180" cy="195" r="3" fill="#004d26" />
-          <circle cx="150" cy="215" r="3" fill="#004d26" />
-          <circle cx="170" cy="225" r="3" fill="#004d26" />
         </svg>
       </div>
 
@@ -79,14 +63,9 @@ const Login: React.FC = () => {
         <Link to="/" className="text-2xl font-bold bg-linear-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent">
           LionDesk
         </Link>
-        <div className="flex items-center space-x-4">
-          <Link to="/activate" className="text-sm font-semibold hover:text-brand-primary transition">
-            Sign up
-          </Link>
-          <Link to="/" className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4.5 py-2.5 rounded-lg transition shadow-xs">
-            Back to Home
-          </Link>
-        </div>
+        <Link to="/login" className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4.5 py-2.5 rounded-lg transition shadow-xs">
+          Back to Login
+        </Link>
       </header>
 
       {/* Main card */}
@@ -94,10 +73,10 @@ const Login: React.FC = () => {
         <div className="bg-brand-card border border-brand-border/40 w-full max-w-md rounded-3xl p-6 sm:p-10 shadow-xl space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-text-main">
-              Portal Login
+              Reset Password
             </h2>
             <p className="text-sm text-brand-text-muted font-semibold leading-relaxed">
-              Hey, Enter your details to get sign in to your account.
+              Enter your recovery code and set your new passcode.
             </p>
           </div>
 
@@ -110,34 +89,30 @@ const Login: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4 pt-2">
             <div className="space-y-1">
               <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
-                Email Address
+                6-Digit Recovery Code
               </label>
               <input
-                type="email"
+                type="text"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
+                maxLength={6}
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="Enter 6-digit recovery code"
+                className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium tracking-widest text-center transition"
               />
             </div>
 
             <div className="space-y-1">
-              <div className="flex justify-between items-center">
-                <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
-                  Passcode
-                </label>
-                <Link to="/forgot-password" className="text-xs font-bold text-brand-primary hover:text-brand-primary-hover transition">
-                  Having trouble in sign in?
-                </Link>
-              </div>
+              <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
+                New Password
+              </label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter your new password"
                   className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl pl-4 pr-11 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
                 />
                 <button
@@ -150,19 +125,33 @@ const Login: React.FC = () => {
               </div>
             </div>
 
+            <div className="space-y-1">
+              <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
+                Confirm New Password
+              </label>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your new password"
+                className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
+              />
+            </div>
+
             <button
               type="submit"
-              disabled={login.isPending}
+              disabled={resetPassword.isPending}
               className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-md hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 flex items-center justify-center space-x-2"
             >
-              {login.isPending ? <span>Signing in...</span> : <span>Sign in</span>}
+              {resetPassword.isPending ? <span>Resetting...</span> : <span>Update Password</span>}
             </button>
           </form>
 
           <div className="text-center text-xs text-brand-text-muted font-bold border-t border-brand-border/25 pt-4">
-            Don't have an account?{' '}
-            <Link to="/activate" className="text-brand-primary hover:text-brand-primary-hover transition">
-              Request Now
+            Remembered password?{' '}
+            <Link to="/login" className="text-brand-primary hover:text-brand-primary-hover transition">
+              Log In
             </Link>
           </div>
         </div>
@@ -181,4 +170,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default ResetPassword;

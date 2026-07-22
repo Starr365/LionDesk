@@ -81,17 +81,23 @@ const ForgotPassword: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-xs transition"
+                disabled={forgotPassword.isPending}
+                className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-xs transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                Send Recovery Link
+                {forgotPassword.isPending ? 'Sending...' : 'Send Recovery Code'}
               </button>
             </form>
           ) : (
-            <div className="p-4 bg-brand-primary/5 border border-brand-primary text-brand-primary text-xs font-bold rounded-xl text-center space-y-3">
-              <p>Recovery link has been dispatched to your email address!</p>
+            <div className="p-4 bg-brand-primary/5 border border-brand-primary text-brand-primary text-xs font-bold rounded-xl text-center space-y-4">
+              <p>Recovery code has been dispatched to your email address!</p>
               <p className="text-[10px] text-brand-text-muted font-semibold">
                 Please check your university inbox or spam folder.
               </p>
+              <div className="pt-2">
+                <Link to="/reset-password" className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white px-4 py-2.5 rounded-xl block text-center transition duration-200">
+                  Enter Recovery Code &rarr;
+                </Link>
+              </div>
             </div>
           )}
 

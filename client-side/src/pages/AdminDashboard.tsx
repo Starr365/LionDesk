@@ -540,7 +540,7 @@ export const AdminDashboard: React.FC = () => {
                     {reports.byCategory.length === 0 ? (
                       <p className="text-xs italic text-brand-text-muted/50">No category statistics available.</p>
                     ) : (
-                      <svg viewBox="0 0 340 200" className="w-full h-auto max-w-[340px]">
+                      <svg viewBox="0 0 340 200" className="w-full h-auto max-w-85">
                         {reports.byCategory.map((cat, index) => {
                           const count = cat.count || 0;
                           const maxCount = Math.max(...reports.byCategory.map(c => c.count), 1);
@@ -580,7 +580,7 @@ export const AdminDashboard: React.FC = () => {
                     System Status breakdown
                   </h3>
                   <div className="flex flex-col sm:flex-row items-center justify-around py-4 gap-4">
-                    <svg viewBox="0 0 150 150" className="w-full h-auto max-w-[150px]">
+                    <svg viewBox="0 0 150 150" className="w-full h-auto max-w-37.5">
                       <circle cx="75" cy="75" r="50" fill="none" stroke="#e1e5e9" strokeWidth="20" />
                       {reports.byStatus.length > 0 ? (
                         (() => {
@@ -699,7 +699,7 @@ export const AdminDashboard: React.FC = () => {
             <div className="border-t border-brand-border/30 pt-4 space-y-4">
               <h4 className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Reassign Complaint workload</h4>
 
-              <form onSubmit={(e) => handleReassign(e, selectedTicket.id)} className="flex gap-2">
+              <form onSubmit={(e) => handleReassign(e, selectedTicket.id)} className="flex flex-col sm:flex-row gap-2">
                 <select
                   required
                   value={selectedStaffId}
@@ -753,9 +753,9 @@ export const AdminDashboard: React.FC = () => {
                 <button
                   type="submit"
                   disabled={resetPassword.isPending}
-                  className="w-1/2 bg-brand-primary text-brand-white font-extrabold py-2 px-4 rounded-xl transition"
+                  className="w-1/2 bg-brand-primary text-brand-white font-extrabold py-2 px-4 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Save
+                  {resetPassword.isPending ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </form>

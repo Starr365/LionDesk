@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { FiMenu } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { FiMenu, FiLogOut } from 'react-icons/fi';
+import { useAuthContext } from './AuthContext';
 import logo from '../../assets/liondesk.svg';
 
 interface SidebarTab {
@@ -28,12 +29,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   onAvatarClick
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    // Redirect to home/login
-    navigate('/login');
-  };
+  const { logout } = useAuthContext();
 
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text-main flex flex-col font-sans">
@@ -65,36 +61,41 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           >
             {userName.split(' ').map((n) => n[0]).join('')}
           </button>
-          <button
-            onClick={handleLogout}
-            className="text-xs font-extrabold border border-brand-border/60 hover:border-brand-primary text-brand-text-muted hover:text-brand-primary px-3 py-1.5 rounded-lg transition"
-          >
-            Sign Out
-          </button>
         </div>
       </header>
 
       <div className="flex flex-1 pt-16">
         {/* Left Sidebar (Desktop) */}
         <aside className="w-64 bg-brand-card border-r border-brand-border/40 hidden md:block fixed left-0 top-16 h-[calc(100vh-64px)] z-20">
-          <nav className="p-4 space-y-2">
-            {tabs.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={tab.onClick}
-                  className={`w-full flex items-center space-x-2.5 rounded-xl text-xs tracking-wide transition-all duration-155 text-left ${
-                    isActive
-                      ? 'bg-brand-primary text-brand-white shadow-md shadow-brand-primary/25 px-4.5 py-3.5 font-bold scale-[1.02]'
-                      : 'text-brand-text-muted hover:text-brand-primary hover:bg-brand-silver/20 px-3.5 py-2.5 font-semibold'
-                  }`}
-                >
-                  {tab.icon}
-                  <span>{tab.name}</span>
-                </button>
-              );
-            })}
+          <nav className="p-4 h-full flex flex-col justify-between pb-8">
+            <div className="space-y-2">
+              {tabs.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={tab.onClick}
+                    className={`w-full flex items-center space-x-2.5 rounded-xl text-xs tracking-wide transition-all duration-155 text-left ${
+                      isActive
+                        ? 'bg-brand-primary text-brand-white shadow-md shadow-brand-primary/25 px-4.5 py-3.5 font-bold scale-[1.02]'
+                        : 'text-brand-text-muted hover:text-brand-primary hover:bg-brand-silver/20 px-3.5 py-2.5 font-semibold'
+                    }`}
+                  >
+                    {tab.icon}
+                    <span>{tab.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="pt-4 border-t border-brand-border/20">
+              <button
+                onClick={logout}
+                className="w-full flex items-center space-x-2.5 rounded-xl text-xs tracking-wide transition-all duration-155 text-left text-brand-text-muted hover:text-red-500 hover:bg-red-50/10 px-3.5 py-2.5 font-semibold"
+              >
+                <FiLogOut className="h-4.5 w-4.5" />
+                <span>Sign Out</span>
+              </button>
+            </div>
           </nav>
         </aside>
 
@@ -106,27 +107,41 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               onClick={() => setMobileMenuOpen(false)}
             />
             <aside className="w-60 bg-brand-card border-r border-brand-border/40 fixed left-0 top-16 h-[calc(100vh-64px)] z-50 md:hidden animate-slide-in">
-              <nav className="p-4 space-y-2">
-                {tabs.map((tab) => {
-                  const isActive = activeTab === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => {
-                        tab.onClick();
-                        setMobileMenuOpen(false);
-                      }}
-                      className={`w-full flex items-center space-x-2.5 rounded-xl text-xs tracking-wide transition-all duration-155 text-left ${
-                        isActive
-                          ? 'bg-brand-primary text-brand-white px-4.5 py-3.5 font-bold scale-[1.02]'
-                          : 'text-brand-text-muted hover:text-brand-primary hover:bg-brand-silver/20 px-3.5 py-2.5 font-semibold'
-                      }`}
-                    >
-                      {tab.icon}
-                      <span>{tab.name}</span>
-                    </button>
-                  );
-                })}
+              <nav className="p-4 h-full flex flex-col justify-between pb-8">
+                <div className="space-y-2">
+                  {tabs.map((tab) => {
+                    const isActive = activeTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => {
+                          tab.onClick();
+                          setMobileMenuOpen(false);
+                        }}
+                        className={`w-full flex items-center space-x-2.5 rounded-xl text-xs tracking-wide transition-all duration-155 text-left ${
+                          isActive
+                            ? 'bg-brand-primary text-brand-white px-4.5 py-3.5 font-bold scale-[1.02]'
+                            : 'text-brand-text-muted hover:text-brand-primary hover:bg-brand-silver/20 px-3.5 py-2.5 font-semibold'
+                        }`}
+                      >
+                        {tab.icon}
+                        <span>{tab.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="pt-4 border-t border-brand-border/20">
+                  <button
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full flex items-center space-x-2.5 rounded-xl text-xs tracking-wide transition-all duration-155 text-left text-brand-text-muted hover:text-red-500 hover:bg-red-50/10 px-3.5 py-2.5 font-semibold"
+                  >
+                    <FiLogOut className="h-4.5 w-4.5" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
               </nav>
             </aside>
           </>

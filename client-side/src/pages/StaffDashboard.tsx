@@ -417,7 +417,7 @@ export const StaffDashboard: React.FC = () => {
               </div>
 
               {selectedTicket.status !== 'closed' && selectedTicket.status !== 'resolved' && (
-                <form onSubmit={handleAddComment} className="flex gap-2">
+                <form onSubmit={handleAddComment} className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     required
@@ -429,7 +429,7 @@ export const StaffDashboard: React.FC = () => {
                   <button
                     type="submit"
                     disabled={addComment.isPending}
-                    className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs"
+                    className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {addComment.isPending ? 'Sending...' : 'Send'}
                   </button>
@@ -443,7 +443,7 @@ export const StaffDashboard: React.FC = () => {
                 <button
                   onClick={() => handleStartWork(selectedTicket.id)}
                   disabled={updateStatus.isPending}
-                  className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 rounded-xl shadow-xs transition"
+                  className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 rounded-xl shadow-xs transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {updateStatus.isPending ? 'Starting...' : 'Acknowledge & Start Work'}
                 </button>
@@ -457,7 +457,7 @@ export const StaffDashboard: React.FC = () => {
                   {resolutionError && (
                     <p className="text-[10px] text-brand-primary font-bold">{resolutionError}</p>
                   )}
-                  <form onSubmit={(e) => handleResolveTicket(e, selectedTicket.id)} className="flex gap-2">
+                  <form onSubmit={(e) => handleResolveTicket(e, selectedTicket.id)} className="flex flex-col sm:flex-row gap-2">
                     <input
                       type="text"
                       required
@@ -469,7 +469,7 @@ export const StaffDashboard: React.FC = () => {
                     <button
                       type="submit"
                       disabled={updateStatus.isPending}
-                      className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition"
+                      className="bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-xs font-bold px-4 py-2 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {updateStatus.isPending ? 'Saving...' : 'Mark Resolved'}
                     </button>

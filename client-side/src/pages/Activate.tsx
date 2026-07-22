@@ -125,14 +125,14 @@ const Activate: React.FC = () => {
             <form onSubmit={handleVerifyRegistry} className="space-y-4 pt-2">
               <div className="space-y-1">
                 <label className="block text-xs font-bold text-brand-text-muted uppercase tracking-wider">
-                  Matric / Reg Number
+                  Matric Number
                 </label>
                 <input
                   type="text"
                   required
                   value={matricNumber}
                   onChange={(e) => setMatricNumber(e.target.value)}
-                  placeholder="e.g., 2022/240456"
+                  placeholder="Enter your matric number"
                   className="w-full bg-brand-bg/40 border border-brand-border/50 rounded-xl px-4 py-3 text-sm text-brand-text-main placeholder-brand-text-muted/65 focus:outline-none focus:border-brand-primary font-medium transition"
                 />
               </div>
@@ -153,10 +153,10 @@ const Activate: React.FC = () => {
 
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-md hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 transition duration-200"
+                disabled={loading || verifyRegistry.isPending}
+                className="w-full bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-md hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
               >
-                {loading ? 'Verifying...' : 'Verify Registry'}
+                {verifyRegistry.isPending ? 'Verifying...' : 'Verify Registry'}
               </button>
             </form>
           ) : (
@@ -208,10 +208,10 @@ const Activate: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="w-2/3 bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-md hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 transition duration-200"
+                  disabled={loading || activate.isPending}
+                  className="w-2/3 bg-brand-primary hover:bg-brand-primary-hover text-brand-white font-extrabold py-3.5 px-4 rounded-xl shadow-md hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
                 >
-                  {loading ? 'Activating...' : 'Activate Profile'}
+                  {activate.isPending ? 'Activating...' : 'Activate Profile'}
                 </button>
               </div>
             </form>

@@ -5,6 +5,7 @@ import LandingPage from './pages/LandingPage';
 import Activate from './pages/Activate';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import StudentDashboard from './pages/StudentDashboard';
 import StaffDashboard from './pages/StaffDashboard';
 import AdminDashboard from './pages/AdminDashboard';
@@ -39,6 +40,7 @@ const App: React.FC = () => {
               <Route path="/activate" element={<Activate />} />
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/student" element={<StudentDashboard />} />
               <Route path="/staff" element={<StaffDashboard />} />
               <Route path="/admin" element={<AdminDashboard />} />

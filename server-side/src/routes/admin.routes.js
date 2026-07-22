@@ -16,7 +16,10 @@ import roleGuard from '../middleware/roleGuard.js';
 
 const router = Router();
 
-// Apply auth and admin role requirements to all sub-routes
+// Shared Categories endpoint (accessible to all authenticated users)
+router.get('/categories', auth, getCategories);
+
+// Apply auth and admin role requirements to all other sub-routes
 router.use(auth, roleGuard('admin'));
 
 // Staff specialist endpoints
@@ -27,8 +30,7 @@ router.post('/staff', createStaff);
 router.patch('/users/:id/toggle-active', toggleUserActive);
 router.post('/users/:id/reset-password', resetUserPassword);
 
-// Categories endpoints
-router.get('/categories', getCategories);
+// Categories write endpoints
 router.post('/categories', createCategory);
 router.patch('/categories/:id', updateCategory);
 router.delete('/categories/:id', deleteCategory);
