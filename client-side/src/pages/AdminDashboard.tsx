@@ -10,6 +10,7 @@ import { useSocketContext } from '../components/shared/SocketContext';
 import { useTickets } from '../hooks/useTickets';
 import { useCategories } from '../hooks/useCategories';
 import { useStaff } from '../hooks/useStaff';
+import { D3BarChart, D3PieChart } from '../components/shared/D3Charts';
 
 export const AdminDashboard: React.FC = () => {
   const { user: currentUser } = useAuthContext();
@@ -540,36 +541,7 @@ export const AdminDashboard: React.FC = () => {
                     {reports.byCategory.length === 0 ? (
                       <p className="text-xs italic text-brand-text-muted/50">No category statistics available.</p>
                     ) : (
-                      <svg viewBox="0 0 340 200" className="w-full h-auto max-w-85">
-                        {reports.byCategory.map((cat, index) => {
-                          const count = cat.count || 0;
-                          const maxCount = Math.max(...reports.byCategory.map(c => c.count), 1);
-                          const barWidth = 35;
-                          const barHeight = (count / maxCount) * 120;
-                          const x = 50 + index * 90;
-                          const y = 150 - barHeight;
-
-                          return (
-                            <g key={cat.name} className="group">
-                              <text x={x + barWidth / 2} y={y - 8} textAnchor="middle" className="text-xs font-extrabold fill-brand-primary">
-                                {count}
-                              </text>
-                              <rect
-                                x={x}
-                                y={y}
-                                width={barWidth}
-                                height={barHeight}
-                                rx="4"
-                                className="fill-brand-primary group-hover:fill-brand-secondary transition duration-200"
-                              />
-                              <text x={x + barWidth / 2} y="170" textAnchor="middle" className="text-[10px] font-bold fill-brand-text-muted">
-                                {cat.name}
-                              </text>
-                            </g>
-                          );
-                        })}
-                        <line x1="30" y1="150" x2="310" y2="150" stroke="#b9c0c3" strokeWidth="1.5" />
-                      </svg>
+                      <D3BarChart data={reports.byCategory} />
                     )}
                   </div>
                 </div>
@@ -580,41 +552,7 @@ export const AdminDashboard: React.FC = () => {
                     System Status breakdown
                   </h3>
                   <div className="flex flex-col sm:flex-row items-center justify-around py-4 gap-4">
-                    <svg viewBox="0 0 150 150" className="w-full h-auto max-w-37.5">
-                      <circle cx="75" cy="75" r="50" fill="none" stroke="#e1e5e9" strokeWidth="20" />
-                      {reports.byStatus.length > 0 ? (
-                        (() => {
-                          let accumulatedPercent = 0;
-                          return reports.byStatus.map((stat, idx) => {
-                            const total = reports.byStatus.reduce((acc, c) => acc + c.count, 0) || 1;
-                            const pct = stat.count / total;
-                            const strokeDasharray = `${pct * 314} 314`;
-                            const strokeDashoffset = `${-accumulatedPercent * 314}`;
-                            accumulatedPercent += pct;
-
-                            const colors = ['#004d26', '#005d2e', '#d4dee5', '#b9c0c3', '#686a6d'];
-                            const strokeColor = colors[idx % colors.length];
-
-                            return (
-                              <circle
-                                key={stat.status}
-                                cx="75"
-                                cy="75"
-                                r="50"
-                                fill="none"
-                                stroke={strokeColor}
-                                strokeWidth="20"
-                                strokeDasharray={strokeDasharray}
-                                strokeDashoffset={strokeDashoffset}
-                                transform="rotate(-90 75 75)"
-                              />
-                            );
-                          });
-                        })()
-                      ) : (
-                        <circle cx="75" cy="75" r="50" fill="none" stroke="#004d26" strokeWidth="20" />
-                      )}
-                    </svg>
+                    <D3PieChart data={reports.byStatus} />
 
                     <div className="space-y-1.5 text-xs font-semibold text-brand-text-muted">
                       {reports.byStatus.map((stat, idx) => {

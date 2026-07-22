@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import gsap from 'gsap';
 import { useAuth } from '../hooks/useAuth';
 import { useAuthContext } from '../components/shared/AuthContext';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
@@ -12,10 +13,26 @@ const Login: React.FC = () => {
   const { login: saveSession } = useAuthContext();
   const { login } = useAuth();
   const navigate = useNavigate();
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (cardRef.current) {
+      gsap.fromTo(
+        cardRef.current,
+        { opacity: 0, y: 25 },
+        { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
+      );
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+
+    if (!email || !password) {
+      setErrorMsg('All fields are required.');
+      return;
+    }
 
     login.mutate(
       { email: email.trim(), password },
@@ -91,7 +108,7 @@ const Login: React.FC = () => {
 
       {/* Main card */}
       <main className="grow flex items-center justify-center py-10 z-10">
-        <div className="bg-brand-card border border-brand-border/40 w-full max-w-md rounded-3xl p-6 sm:p-10 shadow-xl space-y-6">
+        <div ref={cardRef} className="bg-brand-card border border-brand-border/40 w-full max-w-md rounded-3xl p-6 sm:p-10 shadow-xl space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-text-main">
               Portal Login
