@@ -5,7 +5,7 @@ export const Features: React.FC = () => {
   return (
     <section id="features" className="py-20 md:py-28 relative">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-7xl h-full pointer-events-none -z-10">
-        <div className="absolute bottom-12 right-1/4 w-[300px] h-[300px] bg-brand-primary/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-12 right-1/4 w-75 h-75 bg-brand-primary/5 rounded-full blur-[100px]" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 space-y-12 md:space-y-16">
@@ -22,7 +22,7 @@ export const Features: React.FC = () => {
         {/* Feature Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Card 1 */}
-          <div className="bg-brand-card border border-brand-border/40 p-8 rounded-2xl flex flex-col justify-between hover:border-brand-primary/55 transition duration-300 group shadow-xs">
+          <div className="stagger-item bg-brand-card border border-brand-border/40 p-8 rounded-2xl flex flex-col justify-between hover:border-brand-primary/55 transition duration-300 group shadow-xs">
             <div className="space-y-4">
               <div className="h-10 w-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary group-hover:scale-110 transition duration-200">
                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -42,7 +42,7 @@ export const Features: React.FC = () => {
           </div>
 
           {/* Card 2 */}
-          <div className="bg-brand-card border border-brand-border/40 p-8 rounded-2xl flex flex-col justify-between hover:border-brand-primary/55 transition duration-300 group shadow-xs">
+          <div className="stagger-item bg-brand-card border border-brand-border/40 p-8 rounded-2xl flex flex-col justify-between hover:border-brand-primary/55 transition duration-300 group shadow-xs">
             <div className="space-y-4">
               <div className="h-10 w-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary group-hover:scale-110 transition duration-200">
                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -62,7 +62,7 @@ export const Features: React.FC = () => {
           </div>
 
           {/* Card 3 */}
-          <div className="bg-brand-card border border-brand-border/40 p-8 rounded-2xl flex flex-col justify-between hover:border-brand-primary/55 transition duration-300 group shadow-xs">
+          <div className="stagger-item bg-brand-card border border-brand-border/40 p-8 rounded-2xl flex flex-col justify-between hover:border-brand-primary/55 transition duration-300 group shadow-xs">
             <div className="space-y-4">
               <div className="h-10 w-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary group-hover:scale-110 transition duration-200">
                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import gsap from 'gsap';
 import { FiMenu, FiLogOut } from 'react-icons/fi';
 import { useAuthContext } from './AuthContext';
 import logo from '../../assets/liondesk.svg';
@@ -30,6 +31,31 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { logout } = useAuthContext();
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!contentRef.current) return;
+    const ctx = gsap.context(() => {
+      // Subtle slide up and fade in for the main view content
+      gsap.fromTo(
+        contentRef.current,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
+      );
+
+      // Stagger stats cards if they are rendered
+      const cards = contentRef.current?.querySelectorAll('.stagger-card');
+      if (cards && cards.length > 0) {
+        gsap.fromTo(
+          cards,
+          { opacity: 0, y: 15, scale: 0.97 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.1, ease: 'power2.out', delay: 0.05 }
+        );
+      }
+    }, contentRef);
+
+    return () => ctx.revert();
+  }, [children]);
 
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text-main flex flex-col font-sans">
@@ -151,7 +177,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
         {/* Right Main Content */}
         <main className="flex-1 md:pl-64 p-6 sm:p-8 min-h-[calc(100vh-64px)] z-10">
-          <div className="max-w-5xl mx-auto space-y-6">
+          <div ref={contentRef} className="max-w-5xl mx-auto space-y-6">
             {children}
           </div>
         </main>

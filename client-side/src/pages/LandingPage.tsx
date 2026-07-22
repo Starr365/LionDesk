@@ -22,22 +22,58 @@ const LandingPage: React.FC = () => {
     const ctx = gsap.context(() => {
       const sections = gsap.utils.toArray<HTMLElement>('.scroll-section');
       sections.forEach((section) => {
-        gsap.fromTo(
-          section,
-          { opacity: 0, y: 75, scale: 0.95 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 1.1,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: section,
-              start: 'top 88%',
-              toggleActions: 'play none none none',
-            },
-          }
-        );
+        const staggerItems = section.querySelectorAll('.stagger-item');
+
+        if (staggerItems.length > 0) {
+          gsap.fromTo(
+            section,
+            { opacity: 0 },
+            {
+              opacity: 1,
+              duration: 0.5,
+              scrollTrigger: {
+                trigger: section,
+                start: 'top 88%',
+                toggleActions: 'play none none none',
+              },
+            }
+          );
+
+          gsap.fromTo(
+            staggerItems,
+            { opacity: 0, y: 55, scale: 0.94 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.9,
+              stagger: 0.15,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: section,
+                start: 'top 85%',
+                toggleActions: 'play none none none',
+              },
+            }
+          );
+        } else {
+          gsap.fromTo(
+            section,
+            { opacity: 0, y: 75, scale: 0.95 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 1.1,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: section,
+                start: 'top 88%',
+                toggleActions: 'play none none none',
+              },
+            }
+          );
+        }
       });
     }, containerRef);
 

@@ -21,7 +21,7 @@ export const Stats: React.FC = () => {
 
           {/* Right Stats Grid */}
           <div className="lg:col-span-6 grid grid-cols-2 gap-6 md:gap-8">
-            <div className="bg-brand-card border border-brand-border/40 p-6 rounded-2xl space-y-2 shadow-sm">
+            <div className="stagger-item bg-brand-card border border-brand-border/40 p-6 rounded-2xl space-y-2 shadow-sm">
               <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-brand-text-main tracking-tight">
                 100%
               </span>
@@ -29,7 +29,7 @@ export const Stats: React.FC = () => {
                 Digital Accountability
               </p>
             </div>
-            <div className="bg-brand-card border border-brand-border/40 p-6 rounded-2xl space-y-2 shadow-sm">
+            <div className="stagger-item bg-brand-card border border-brand-border/40 p-6 rounded-2xl space-y-2 shadow-sm">
               <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-brand-text-main tracking-tight">
                 &lt; 3s
               </span>
@@ -37,7 +37,7 @@ export const Stats: React.FC = () => {
                 Rapid Page Response
               </p>
             </div>
-            <div className="bg-brand-card border border-brand-border/40 p-6 rounded-2xl space-y-2 shadow-sm">
+            <div className="stagger-item bg-brand-card border border-brand-border/40 p-6 rounded-2xl space-y-2 shadow-sm">
               <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-brand-text-main tracking-tight">
                 0
               </span>
@@ -45,7 +45,7 @@ export const Stats: React.FC = () => {
                 Lost Submissions
               </p>
             </div>
-            <div className="bg-brand-card border border-brand-border/40 p-6 rounded-2xl space-y-2 shadow-sm">
+            <div className="stagger-item bg-brand-card border border-brand-border/40 p-6 rounded-2xl space-y-2 shadow-sm">
               <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-brand-text-main tracking-tight">
                 24/7
               </span>
