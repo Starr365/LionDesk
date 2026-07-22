@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useAuthContext } from '../components/shared/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 const Activate: React.FC = () => {
   const { login } = useAuthContext();
+  const { verifyRegistry, activate } = useAuth();
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [matricNumber, setMatricNumber] = useState('');
@@ -21,25 +23,17 @@ const Activate: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/verify-registry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ matric_no: matricNumber.trim(), full_name: fullName.trim() })
+      await verifyRegistry.mutateAsync({
+        matric_no: matricNumber.trim(),
+        full_name: fullName.trim()
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error(data.error || 'Verification failed. Please try again.');
-        setLoading(false);
-        return;
-      }
 
       setEmail('');
       setStep(2);
       toast.success('Registry details verified! Please enter your preferred email and password.');
-    } catch (err) {
-      toast.error('Cannot connect to verification server. Please try again later.');
+    } catch (err: any) {
+      const errMsg = err.response?.data?.error || 'Cannot connect to verification server. Please try again later.';
+      toast.error(errMsg);
     } finally {
       setLoading(false);
     }
@@ -51,23 +45,12 @@ const Activate: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/activate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          matric_no: matricNumber.trim(),
-          full_name: fullName.trim(),
-          email: email.trim(),
-          password
-        })
+      const data = await activate.mutateAsync({
+        matric_no: matricNumber.trim(),
+        full_name: fullName.trim(),
+        email: email.trim(),
+        password
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error(data.error || 'Activation failed.');
-        return;
-      }
 
       // Log in user by updating auth context state
       if (data.token && data.user) {
@@ -75,8 +58,9 @@ const Activate: React.FC = () => {
       }
       toast.success('Profile activated successfully! Welcome to LionDesk.');
       navigate('/student');
-    } catch (err) {
-      toast.error('Server connection failed. Try again.');
+    } catch (err: any) {
+      const errMsg = err.response?.data?.error || 'Server connection failed. Try again.';
+      toast.error(errMsg);
     } finally {
       setLoading(false);
     }
