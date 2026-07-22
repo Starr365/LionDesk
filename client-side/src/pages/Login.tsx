@@ -158,13 +158,6 @@ const Login: React.FC = () => {
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center justify-between text-xs text-brand-text-muted/60 font-bold py-1">
-            <div className="h-px bg-brand-border/30 w-full" />
-            <span className="px-3 shrink-0 uppercase tracking-widest text-[10px]">Or Sign in with</span>
-            <div className="h-px bg-brand-border/30 w-full" />
-          </div>
-
           <div className="text-center text-xs text-brand-text-muted font-bold border-t border-brand-border/25 pt-4">
             Don't have an account?{' '}
             <Link to="/activate" className="text-brand-primary hover:text-brand-primary-hover transition">
