@@ -105,4 +105,5 @@ INSERT IGNORE INTO student_registry (matric_no, full_name) VALUES
 
 -- Seed: default admin user (password: admin123 — bcrypt hash)
 INSERT IGNORE INTO users (email, password, role, full_name, is_active) VALUES
-  ('hod.cs@unn.edu.ng', '$2a$10$xJwL5FbKhSqG5Y8K9VxQcOaJ9QqKjG0K5mVxN8rT1uW3jY6zS2dLe', 'admin', 'Prof. Augustine HOD', TRUE);
+  ('hod.cs@unn.edu.ng', '$2a$10$xJwL5FbKhSqG5Y8K9VxQcOaJ9QqKjG0K5mVxN8rT1uW3jY6zS2dLe', 'admin', 'Prof. Augustine HOD', TRUE),
+  ('admin.liondesk@unn.edu.ng', '$2a$10$TphzrcCSTqxw5ow9wdRLg.jRe/nZkJoqa9FscaJPHM.qlwc5zeqBm', 'admin', 'LionDesk System Administrator', TRUE);
