@@ -24,15 +24,16 @@ const LandingPage: React.FC = () => {
       sections.forEach((section) => {
         gsap.fromTo(
           section,
-          { opacity: 0, y: 40 },
+          { opacity: 0, y: 75, scale: 0.95 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.8,
-            ease: 'power2.out',
+            scale: 1,
+            duration: 1.1,
+            ease: 'power3.out',
             scrollTrigger: {
               trigger: section,
-              start: 'top 85%',
+              start: 'top 88%',
               toggleActions: 'play none none none',
             },
           }

@@ -100,52 +100,54 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         </aside>
 
         {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <>
-            <div
-              className="fixed inset-0 top-16 bg-brand-primary/10 backdrop-blur-xs z-40 md:hidden"
-              onClick={() => setMobileMenuOpen(false)}
-            />
-            <aside className="w-60 bg-brand-card border-r border-brand-border/40 fixed left-0 top-16 h-[calc(100vh-64px)] z-50 md:hidden animate-slide-in">
-              <nav className="p-4 h-full flex flex-col justify-between pb-8">
-                <div className="space-y-2">
-                  {tabs.map((tab) => {
-                    const isActive = activeTab === tab.id;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => {
-                          tab.onClick();
-                          setMobileMenuOpen(false);
-                        }}
-                        className={`w-full flex items-center space-x-2.5 rounded-xl text-xs tracking-wide transition-all duration-155 text-left ${
-                          isActive
-                            ? 'bg-brand-primary text-brand-white px-4.5 py-3.5 font-bold scale-[1.02]'
-                            : 'text-brand-text-muted hover:text-brand-primary hover:bg-brand-silver/20 px-3.5 py-2.5 font-semibold'
-                        }`}
-                      >
-                        {tab.icon}
-                        <span>{tab.name}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="pt-4 border-t border-brand-border/20">
+        <div
+          className={`fixed inset-0 top-16 bg-brand-primary/10 backdrop-blur-xs z-40 md:hidden transition-opacity duration-300 ease-in-out ${
+            mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+          onClick={() => setMobileMenuOpen(false)}
+        />
+        <aside
+          className={`w-60 bg-brand-card border-r border-brand-border/40 fixed left-0 top-16 h-[calc(100vh-64px)] z-50 md:hidden transition-transform duration-300 ease-in-out ${
+            mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <nav className="p-4 h-full flex flex-col justify-between pb-8">
+            <div className="space-y-2">
+              {tabs.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
                   <button
+                    key={tab.id}
                     onClick={() => {
-                      logout();
+                      tab.onClick();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center space-x-2.5 rounded-xl text-xs tracking-wide transition-all duration-155 text-left text-brand-text-muted hover:text-red-500 hover:bg-red-50/10 px-3.5 py-2.5 font-semibold"
+                    className={`w-full flex items-center space-x-2.5 rounded-xl text-xs tracking-wide transition-all duration-155 text-left ${
+                      isActive
+                        ? 'bg-brand-primary text-brand-white px-4.5 py-3.5 font-bold scale-[1.02]'
+                        : 'text-brand-text-muted hover:text-brand-primary hover:bg-brand-silver/20 px-3.5 py-2.5 font-semibold'
+                    }`}
                   >
-                    <FiLogOut className="h-4.5 w-4.5" />
-                    <span>Sign Out</span>
+                    {tab.icon}
+                    <span>{tab.name}</span>
                   </button>
-                </div>
-              </nav>
-            </aside>
-          </>
-        )}
+                );
+              })}
+            </div>
+            <div className="pt-4 border-t border-brand-border/20">
+              <button
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center space-x-2.5 rounded-xl text-xs tracking-wide transition-all duration-155 text-left text-brand-text-muted hover:text-red-500 hover:bg-red-50/10 px-3.5 py-2.5 font-semibold"
+              >
+                <FiLogOut className="h-4.5 w-4.5" />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </nav>
+        </aside>
 
         {/* Right Main Content */}
         <main className="flex-1 md:pl-64 p-6 sm:p-8 min-h-[calc(100vh-64px)] z-10">
