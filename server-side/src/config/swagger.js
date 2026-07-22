@@ -20,7 +20,7 @@ const options = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'Enter your JWT token in the format: Bearer <token>'
+          description: 'Enter your JWT token in the format: Bearer <token>. Note: Browser sessions are automatically authenticated via secure HTTP-Only cookies.'
         }
       },
       schemas: {
@@ -172,8 +172,8 @@ const options = {
       },
       '/api/auth/forgot-password': {
         post: {
-          summary: 'Request Password Reset Token',
-          description: 'Generates and stores a hashed password recovery token. Emails token to user (Resend).',
+          summary: 'Request Password Reset Code',
+          description: 'Generates and stores a hashed 6-digit numeric recovery code. Expiration is exactly 15 minutes. Emails code to user via Resend service.',
           tags: ['Auth'],
           requestBody: {
             required: true,
@@ -190,14 +190,14 @@ const options = {
             }
           },
           responses: {
-            200: { description: 'Token generated (logged to server console in dev).' }
+            200: { description: '6-digit recovery code generated and sent (logged to server console in dev).' }
           }
         }
       },
       '/api/auth/reset-password': {
         post: {
           summary: 'Reset Password',
-          description: 'Resets the password using the token sent in the forgot-password flow.',
+          description: 'Resets the password using the 6-digit numeric recovery code sent in the forgot-password flow.',
           tags: ['Auth'],
           requestBody: {
             required: true,
@@ -207,7 +207,7 @@ const options = {
                   type: 'object',
                   required: ['token', 'new_password'],
                   properties: {
-                    token: { type: 'string' },
+                    token: { type: 'string', description: 'The 6-digit numeric recovery code' },
                     new_password: { type: 'string', minLength: 6 }
                   }
                 }
@@ -216,7 +216,17 @@ const options = {
           },
           responses: {
             200: { description: 'Password reset successfully.' },
-            400: { description: 'Invalid or expired token.' }
+            400: { description: 'Invalid or expired recovery code.' }
+          }
+        }
+      },
+      '/api/auth/logout': {
+        post: {
+          summary: 'User Logout',
+          description: 'Logs out the user by clearing the HTTP-Only auth cookie.',
+          tags: ['Auth'],
+          responses: {
+            200: { description: 'Logged out successfully.' }
           }
         }
       },

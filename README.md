@@ -9,6 +9,7 @@ LionDesk is a premium, automated web-based ticketing platform built specifically
 *   **Backend**: Node.js with Express.js, Socket.IO (instant WebSocket updates).
 *   **Database**: MySQL (relational schema with key-constraint bindings and ACID transaction guarantees).
 *   **Services**: Resend API (email notifications), Swagger UI (REST documentation at `/api-docs/`), node-cron (hourly automated business-day escalation checking).
+*   **Session Security**: HTTP-Only cookies for browser authentication, with a fallback `Authorization: Bearer` header check for programmatic API and WebSocket clients.
 
 ---
 
@@ -35,7 +36,7 @@ graph TD
 ```
 
 ### System Communication Flow
-1.  **Client-Server Interface**: The React frontend talks to the Express backend using an Axios client pre-configured with interceptors that attach JWT tokens from `localStorage` to every request.
+1.  **Client-Server Interface**: The React frontend communicates with the Express backend via an Axios client configured with `withCredentials: true`, transmitting credentials inside secure, HTTP-Only cookies. A fallback mechanism allows JWT transmission inside standard authorization headers.
 2.  **State Syncing**: TanStack Query handles local server-state caches, while a background Socket.IO connection pushes instant notifications when tickets are updated or assigned, triggering query updates.
 3.  **Cron Services**: An hourly cron daemon evaluates database entries to identify unresolved tickets exceeding the 2 business days limit, recalculating statuses and sending email alerts via the Resend service.
 
@@ -46,8 +47,8 @@ graph TD
 ### 1. MySQL 8 (Relational) vs. MongoDB (NoSQL)
 We selected MySQL because LionDesk relies on strict relational logic: tickets must map directly to registered students, staff members, and category tables. Using foreign key constraints (`ON DELETE RESTRICT`, `ON UPDATE CASCADE`) guarantees referential integrity, preventing orphans, while SQL transactions ensure that status updates, history comments, and staff workload recalculations execute atomically under strict ACID guarantees.
 
-### 2. JWT Authentication vs. Server-Side Sessions
-We chose stateless JWT authentication over traditional session cookies to keep the Node.js API server fully stateless. This allows the backend to scale horizontally without session synchronizers, and facilitates deployment to serverless platforms (like Render or Vercel) while maintaining secure token authorization inside standard HTTP headers.
+### 2. JWT Authentication via Secure HTTP-Only Cookies
+To secure our authentication token against client-side script inspection (mitigating XSS vulnerabilities), we transitioned browser clients to transmit stateless JWT payloads inside secure, HTTP-Only cookies. This keeps the Node.js API server completely stateless (scaling horizontally without session caches) while safeguarding access credentials. Programmatic verification from headers is preserved as a backup fallback path for socket events and testing environments.
 
 ### 3. Progressive Split-Step Activate Student Activation Flow
 To block malicious registrants, we designed a two-step activation wizard. In the first step, the student inputs their Matriculation Number and Full Name; the backend queries the preloaded official registry table and throws highly detailed errors (e.g., distinguishing "mismatched name" from "matric number not in registry"). Only upon validation does Step 2 present the password creation form, preventing database clutter from invalid account records.
