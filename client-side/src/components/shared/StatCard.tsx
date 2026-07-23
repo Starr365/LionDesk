@@ -9,7 +9,7 @@ interface StatCardProps {
 
 export const StatCard: React.FC<StatCardProps> = ({ title, value, icon, description }) => {
   return (
-    <div className="bg-brand-card border border-brand-border/40 p-6 rounded-2xl space-y-3 shadow-xs relative overflow-hidden group hover:border-brand-primary/45 transition">
+    <div className="stagger-card bg-brand-card border border-brand-border/40 p-6 rounded-2xl space-y-3 shadow-xs relative overflow-hidden group hover:border-brand-primary/45 transition">
       <div className="flex justify-between items-start">
         <div className="space-y-1">
           <p className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">{title}</p>

@@ -18,7 +18,7 @@ export const Roles: React.FC = () => {
         {/* Roles Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
           {/* Student Card */}
-          <div className="bg-brand-card border border-brand-border/45 p-8 rounded-3xl flex flex-col justify-between hover:border-brand-primary/50 transition duration-300 relative group shadow-sm">
+          <div className="stagger-item bg-brand-card border border-brand-border/45 p-8 rounded-3xl flex flex-col justify-between hover:border-brand-primary/50 transition duration-300 relative group shadow-sm">
             <div className="space-y-6">
               <div className="space-y-2">
                 <span className="text-xs font-extrabold uppercase tracking-wider text-brand-primary">
@@ -57,7 +57,7 @@ export const Roles: React.FC = () => {
           </div>
 
           {/* Faculty Staff Card */}
-          <div className="bg-brand-card border-2 border-brand-primary/75 p-8 rounded-3xl flex flex-col justify-between relative group shadow-md">
+          <div className="stagger-item bg-brand-card border-2 border-brand-primary/75 p-8 rounded-3xl flex flex-col justify-between relative group shadow-md">
             {/* Featured Badge */}
             <div className="absolute top-0 right-8 -translate-y-1/2 bg-brand-primary text-brand-white text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
               Departmental Staff
@@ -100,7 +100,7 @@ export const Roles: React.FC = () => {
           </div>
 
           {/* Administrator (HOD) Card */}
-          <div className="bg-brand-card border border-brand-border/45 p-8 rounded-3xl flex flex-col justify-between hover:border-brand-primary/50 transition duration-300 relative group shadow-sm">
+          <div className="stagger-item bg-brand-card border border-brand-border/45 p-8 rounded-3xl flex flex-col justify-between hover:border-brand-primary/50 transition duration-300 relative group shadow-sm">
             <div className="space-y-6">
               <div className="space-y-2">
                 <span className="text-xs font-extrabold uppercase tracking-wider text-brand-primary">
