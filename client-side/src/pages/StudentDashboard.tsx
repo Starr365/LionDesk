@@ -7,6 +7,7 @@ import { DashboardLayout } from '../components/shared/DashboardLayout';
 import { StatCard } from '../components/shared/StatCard';
 import { TicketTable } from '../components/shared/TicketTable';
 import { EmptyState } from '../components/shared/EmptyState';
+import { ModalOverlay } from '../components/shared/ModalOverlay';
 import { FiHome, FiClock, FiCheckCircle, FiFileText, FiUser } from 'react-icons/fi';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -470,8 +471,7 @@ export const StudentDashboard: React.FC = () => {
 
       {/* Detail Dialog Modal (Kept for overlays details) */}
       {detailModalOpen && selectedTicket && (
-        <div className="fixed inset-0 bg-brand-primary/15 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-brand-card border border-brand-border/40 w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+        <ModalOverlay onClose={() => { setDetailModalOpen(false); setSelectedTicketId(null); }}>
             {/* Header */}
             <div className="flex justify-between items-start border-b border-brand-border/30 pb-4">
               <div>
@@ -610,8 +610,7 @@ export const StudentDashboard: React.FC = () => {
                 </div>
               </div>
             )}
-          </div>
-        </div>
+        </ModalOverlay>
       )}
     </DashboardLayout>
   );

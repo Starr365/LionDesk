@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '../components/shared/DashboardLayout';
 import { StatCard } from '../components/shared/StatCard';
 import { TicketTable } from '../components/shared/TicketTable';
+import { DataTable } from '../components/shared/DataTable';
+import { ModalOverlay } from '../components/shared/ModalOverlay';
 import { EmptyState } from '../components/shared/EmptyState';
 import { FiInbox, FiUsers, FiSettings, FiShield, FiBarChart2, FiFolder, FiActivity, FiAlertTriangle } from 'react-icons/fi';
 import { useQueryClient } from '@tanstack/react-query';
@@ -323,63 +325,58 @@ export const AdminDashboard: React.FC = () => {
                 }}
               />
             ) : (
-              <div className="bg-brand-card border border-brand-border/40 rounded-2xl overflow-hidden shadow-xs">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="border-b border-brand-border/30 bg-brand-bg/30 text-xs font-extrabold uppercase tracking-wider text-brand-text-muted">
-                        <th className="py-4 px-6">Specialist Name</th>
-                        <th className="py-4 px-6">Specialty Category</th>
-                        <th className="py-4 px-6">Email Address</th>
-                        <th className="py-4 px-6">Active Handled Workloads</th>
-                        <th className="py-4 px-6">Status</th>
-                        <th className="py-4 px-6 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-brand-border/20 text-sm font-semibold text-brand-text-main">
-                      {staffList.map((s) => (
-                        <tr key={s.id} className="hover:bg-brand-bg/15 transition">
-                          <td className="py-4 px-6 font-bold">{s.full_name}</td>
-                          <td className="py-4 px-6">
-                            <span className="text-xs font-bold bg-brand-silver/10 px-2 py-1 rounded text-brand-text-muted">
-                              {s.category || 'Unassigned'}
-                            </span>
-                          </td>
-                          <td className="py-4 px-6 text-brand-text-muted">{s.email}</td>
-                          <td className="py-4 px-6">
-                            <span className="font-extrabold text-brand-primary">{s.workload_count} active tickets</span>
-                          </td>
-                          <td className="py-4 px-6">
-                            {!s.is_active ? (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-silver/20 text-brand-text-muted border border-brand-border/30">
-                                Inactive
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-secondary/10 text-brand-secondary border border-brand-secondary/20">
-                                Active
-                              </span>
-                            )}
-                          </td>
-                          <td className="py-4 px-6 text-right space-x-2">
-                            <button
-                              onClick={() => setPasswordResetUserId(s.id)}
-                              className="bg-transparent border border-brand-border hover:bg-brand-bg text-brand-text-muted text-[10px] font-extrabold px-2.5 py-1 rounded transition"
-                            >
-                              Reset Pass
-                            </button>
-                            <button
-                              onClick={() => handleToggleStaffActive(s.id)}
-                              className="bg-transparent border border-brand-primary hover:bg-brand-primary hover:text-brand-white text-brand-primary text-[10px] font-extrabold px-2.5 py-1 rounded transition"
-                            >
-                              {!s.is_active ? 'Activate' : 'Deactivate'}
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              <DataTable
+                data={staffList}
+                keyExtractor={(s) => s.id}
+                columns={[
+                  { key: 'full_name', label: 'Specialist Name', className: 'font-bold' },
+                  {
+                    key: 'category',
+                    label: 'Specialty Category',
+                    render: (s) => (
+                      <span className="text-xs font-bold bg-brand-silver/10 px-2 py-1 rounded text-brand-text-muted">
+                        {s.category || 'Unassigned'}
+                      </span>
+                    ),
+                  },
+                  { key: 'email', label: 'Email Address', className: 'text-brand-text-muted' },
+                  {
+                    key: 'workload_count',
+                    label: 'Active Workloads',
+                    render: (s) => (
+                      <span className="font-extrabold text-brand-primary">{s.workload_count} active tickets</span>
+                    ),
+                  },
+                  {
+                    key: 'is_active',
+                    label: 'Status',
+                    render: (s) =>
+                      s.is_active ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-secondary/10 text-brand-secondary border border-brand-secondary/20">
+                          Active
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-silver/20 text-brand-text-muted border border-brand-border/30">
+                          Inactive
+                        </span>
+                      ),
+                  },
+                ]}
+                actions={[
+                  {
+                    label: 'Reset Pass',
+                    onClick: (s) => setPasswordResetUserId(s.id),
+                    variant: 'ghost',
+                  },
+                  {
+                    label: (s) => (s.is_active ? 'Deactivate' : 'Activate'),
+                    onClick: (s) => handleToggleStaffActive(s.id),
+                    variant: 'outline',
+                  },
+                ]}
+                emptyTitle="No staff specialists registered"
+                emptyDescription="Create a staff account and link them to ticket categories to begin auto-routing incoming complaints."
+              />
             )}
           </div>
         )}
@@ -399,9 +396,9 @@ export const AdminDashboard: React.FC = () => {
               ) : (
                 <div className="grid grid-cols-1 gap-4">
                   {categories.map((c) => (
-                    <div key={c.id} className="bg-brand-card border border-brand-border/40 p-5 rounded-2xl flex justify-between items-start shadow-xs">
+                    <div key={c.id} className="bg-brand-card border border-brand-border/40 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start gap-3 shadow-xs">
                       <div className="space-y-1 max-w-md">
-                        <div className="flex items-center space-x-2.5">
+                        <div className="flex flex-wrap items-center gap-2">
                           <h4 className="text-lg font-bold text-brand-text-main">{c.name}</h4>
                           <span className="text-[10px] font-extrabold uppercase bg-brand-silver/20 text-brand-text-muted px-2 py-0.5 rounded">
                             Escalation: {c.escalation_hours}h
@@ -487,40 +484,31 @@ export const AdminDashboard: React.FC = () => {
                 icon="folder"
               />
             ) : (
-              <div className="bg-brand-card border border-brand-border/40 rounded-2xl overflow-hidden shadow-xs">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-sm font-semibold text-brand-text-main">
-                    <thead>
-                      <tr className="border-b border-brand-border/30 bg-brand-bg/30 text-xs font-extrabold uppercase tracking-wider text-brand-text-muted">
-                        <th className="py-4 px-6">Matric / Registration Number</th>
-                        <th className="py-4 px-6">Official Full Name</th>
-                        <th className="py-4 px-6">Official Email</th>
-                        <th className="py-4 px-6">Activation Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-brand-border/20">
-                      {registry.map((r) => (
-                        <tr key={r.id} className="hover:bg-brand-bg/15 transition">
-                          <td className="py-4 px-6 font-bold text-brand-primary">{r.matric_no}</td>
-                          <td className="py-4 px-6">{r.full_name}</td>
-                          <td className="py-4 px-6 text-brand-text-muted">{r.email}</td>
-                          <td className="py-4 px-6">
-                            {r.is_used ? (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-primary text-brand-white">
-                                Registered
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-secondary/15 text-brand-secondary border border-brand-secondary/20">
-                                Unactivated
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              <DataTable
+                data={registry}
+                keyExtractor={(r) => r.id}
+                columns={[
+                  { key: 'matric_no', label: 'Matric / Reg Number', className: 'font-bold text-brand-primary' },
+                  { key: 'full_name', label: 'Official Full Name' },
+                  { key: 'email', label: 'Official Email', className: 'text-brand-text-muted' },
+                  {
+                    key: 'is_used',
+                    label: 'Activation Status',
+                    render: (r) =>
+                      r.is_used ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-primary text-brand-white">
+                          Registered
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-secondary/15 text-brand-secondary border border-brand-secondary/20">
+                          Unactivated
+                        </span>
+                      ),
+                  },
+                ]}
+                emptyTitle="Registry is empty"
+                emptyDescription="Add entries to student_registry table to authorize student self-activations."
+              />
             )}
           </div>
         )}
@@ -579,8 +567,7 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Ticket Details Reassignment Dialog */}
       {detailModalOpen && selectedTicket && (
-        <div className="fixed inset-0 bg-brand-primary/15 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-brand-card border border-brand-border/40 w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+        <ModalOverlay onClose={() => { setDetailModalOpen(false); setSelectedTicketId(null); }}>
             {/* Header */}
             <div className="flex justify-between items-start border-b border-brand-border/30 pb-4">
               <div>
@@ -660,14 +647,12 @@ export const AdminDashboard: React.FC = () => {
                 </button>
               </form>
             </div>
-          </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Reset password Modal */}
       {passwordResetUserId && (
-        <div className="fixed inset-0 bg-brand-primary/15 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-brand-card border border-brand-border/40 w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
+        <ModalOverlay onClose={() => setPasswordResetUserId(null)} maxWidth="max-w-md">
             <h3 className="text-lg font-extrabold text-brand-text-main">Reset Staff Password</h3>
             {resetError && <p className="text-xs text-red-600 font-bold">{resetError}</p>}
             {resetSuccess && <p className="text-xs text-brand-secondary font-bold">{resetSuccess}</p>}
@@ -697,14 +682,12 @@ export const AdminDashboard: React.FC = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Create Staff Specialist Modal Overlay */}
       {staffModalOpen && (
-        <div className="fixed inset-0 bg-brand-primary/15 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-brand-card border border-brand-border/40 w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+        <ModalOverlay onClose={() => setStaffModalOpen(false)} maxWidth="max-w-md">
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="text-lg font-extrabold text-brand-text-main">Add Staff Specialist</h3>
@@ -781,8 +764,7 @@ export const AdminDashboard: React.FC = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+        </ModalOverlay>
       )}
     </DashboardLayout>
   );
