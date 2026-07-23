@@ -31,6 +31,11 @@ export const sendPasswordResetEmail = async (email, token) => {
 
     if (error) {
       console.error('[Email] Resend error details:', error);
+      if (error.statusCode === 403 || error.message?.includes('testing emails')) {
+        console.warn(
+          '[Email Warning] Resend is using onboarding@resend.dev which restricts email dispatch strictly to the account owner (mmesomanzeribe@gmail.com). To send to all user emails, verify a custom domain on resend.com/domains.'
+        );
+      }
       return { success: false, error: error.message };
     }
 
@@ -40,3 +45,42 @@ export const sendPasswordResetEmail = async (email, token) => {
     return { success: false, error: error.message };
   }
 };
+
+export const sendNotificationEmail = async (email, subject, title, message) => {
+  const from = process.env.EMAIL_FROM || 'onboarding@resend.dev';
+  try {
+    console.log(`[Email] Dispatching notification to ${email}: ${title}`);
+    
+    const { data, error } = await resend.emails.send({
+      from,
+      to: email,
+      subject: `LionDesk - ${subject}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; max-width: 500px; margin: 0 auto; border: 1px solid #e1e5e9; border-radius: 12px; color: #333;">
+          <h2 style="color: #004d26; text-align: center;">LionDesk Help-Desk</h2>
+          <hr style="border: 0; border-top: 1px solid #e1e5e9; margin: 20px 0;" />
+          <h3 style="color: #004d26; margin-bottom: 10px;">${title}</h3>
+          <p style="line-height: 1.6; color: #444;">${message || ''}</p>
+          <hr style="border: 0; border-top: 1px solid #e1e5e9; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #686a6d;">This is an automated notification from LionDesk Departmental Support System.</p>
+        </div>
+      `
+    });
+
+    if (error) {
+      console.error('[Email] Resend error details:', error);
+      if (error.statusCode === 403 || error.message?.includes('testing emails')) {
+        console.warn(
+          '[Email Warning] Resend is using onboarding@resend.dev which restricts email dispatch strictly to the account owner (mmesomanzeribe@gmail.com). To send to all user emails, verify a custom domain on resend.com/domains.'
+        );
+      }
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('[Email] Resend sending failed:', error.message);
+    return { success: false, error: error.message };
+  }
+};
+

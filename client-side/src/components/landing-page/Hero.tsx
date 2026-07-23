@@ -15,9 +15,9 @@ export const Hero: React.FC = () => {
         .fromTo('.hero-title', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.9 }, '-=0.5')
         .fromTo('.hero-desc', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.55')
         .fromTo('.hero-actions', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7 }, '-=0.5')
-        .fromTo('.hero-mockup', 
-          { opacity: 0, scale: 0.92, y: 80, rotateX: 12, transformPerspective: 1000 }, 
-          { opacity: 1, scale: 1, y: 0, rotateX: 0, duration: 1.3, ease: 'power4.out' }, 
+        .fromTo('.hero-mockup',
+          { opacity: 0, scale: 0.92, y: 80, rotateX: 12, transformPerspective: 1000 },
+          { opacity: 1, scale: 1, y: 0, rotateX: 0, duration: 1.3, ease: 'power4.out' },
           '-=0.5'
         );
     }, heroRef);
@@ -26,7 +26,7 @@ export const Hero: React.FC = () => {
   }, []);
 
   return (
-    <section ref={heroRef} className="relative overflow-hidden pt-36 pb-20 md:pt-48 md:pb-28">
+    <section ref={heroRef} className="relative overflow-hidden pt-15 pb-20 md:pt-20 md:pb-28">
       {/* Background gradients (soft overlay for light theme) */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none -z-10">
         <div className="absolute top-12 left-1/4 w-100 h-100 bg-brand-primary/5 rounded-full blur-[120px]" />
