@@ -118,7 +118,7 @@ Follow these step-by-step commands to get the system running locally in under 5 
 ## 📸 Interface Screenshots & Responsive Views
 
 ### Student Dashboard View (Desktop & Mobile)
-*   **Desktop**: Features a rich three-column layout showing active complaint counters, dynamic status timeline steps, and real-time chat bubbles with specialists.
+*   **Desktop**: 
 *   **Mobile**: Collapse sidebar transitions into a bottom nav bar; data tables convert to touch-friendly card elements.
 
 ### Administrative Control Hub (HOD View)
