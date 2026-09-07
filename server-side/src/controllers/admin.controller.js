@@ -274,10 +274,33 @@ export const getReportsData = async (req, res) => {
        ORDER BY date ASC`
     );
 
+    // 4. Average resolution time (in hours)
+    const [resolutionStats] = await pool.query(
+      `SELECT ROUND(AVG(TIMESTAMPDIFF(MINUTE, created_at, resolved_at)) / 60, 1) AS avg_resolution_hours,
+              COUNT(*) AS total_resolved
+       FROM tickets
+       WHERE resolved_at IS NOT NULL`
+    );
+
+    // 5. Staff Performance Metrics (resolved tickets count)
+    const [staffStats] = await pool.query(
+      `SELECT u.full_name AS staff_name,
+              COUNT(t.id) AS total_assigned,
+              SUM(CASE WHEN t.status IN ('resolved', 'closed') THEN 1 ELSE 0 END) AS resolved_count
+       FROM users u
+       JOIN staff s ON u.id = s.user_id
+       LEFT JOIN tickets t ON u.id = t.staff_id
+       WHERE u.role = 'staff'
+       GROUP BY u.id, u.full_name`
+    );
+
     res.json({
       byCategory: catVolume,
       byStatus: statusVolume,
-      timeline: timelineVolume
+      timeline: timelineVolume,
+      avgResolutionHours: resolutionStats[0]?.avg_resolution_hours || 0,
+      totalResolved: resolutionStats[0]?.total_resolved || 0,
+      staffPerformance: staffStats
     });
   } catch (error) {
     console.error('[Admin] getReportsData error:', error.message);

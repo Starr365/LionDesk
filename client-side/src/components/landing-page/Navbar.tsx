@@ -32,6 +32,13 @@ export const Navbar: React.FC = () => {
         {/* Desktop Links */}
         <div className="hidden md:flex items-center space-x-8">
           <a
+            href="#"
+            onClick={(e) => { e.preventDefault(); setIsOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            className="text-brand-text-muted hover:text-brand-primary text-sm font-semibold transition"
+          >
+            Home
+          </a>
+          <a
             href="#features"
             onClick={(e) => handleNavClick(e, '#features')}
             className="text-brand-text-muted hover:text-brand-primary text-sm font-semibold transition"
@@ -39,25 +46,18 @@ export const Navbar: React.FC = () => {
             Features
           </a>
           <a
-            href="#roles"
-            onClick={(e) => handleNavClick(e, '#roles')}
+            href="#how-it-works"
+            onClick={(e) => handleNavClick(e, '#how-it-works')}
             className="text-brand-text-muted hover:text-brand-primary text-sm font-semibold transition"
           >
-            Roles
+            How it works
           </a>
           <a
-            href="#security"
-            onClick={(e) => handleNavClick(e, '#security')}
+            href="#documentation"
+            onClick={(e) => handleNavClick(e, '#documentation')}
             className="text-brand-text-muted hover:text-brand-primary text-sm font-semibold transition"
           >
-            Security &amp; Integrity
-          </a>
-          <a
-            href="#about-cs"
-            onClick={(e) => handleNavClick(e, '#about-cs')}
-            className="text-brand-text-muted hover:text-brand-primary text-sm font-semibold transition"
-          >
-            About CS UNN
+            Documentation
           </a>
         </div>
 
@@ -65,7 +65,7 @@ export const Navbar: React.FC = () => {
         <div className="hidden md:flex items-center space-x-4">
           <Link
             to="/login"
-            className="text-brand-text-muted hover:text-brand-primary text-sm font-bold px-4 py-2 hover:bg-brand-silver/20 rounded-lg transition border border-transparent hover:border-brand-border"
+            className="text-brand-text-muted hover:text-brand-primary text-sm font-bold px-4 py-2 hover:bg-brand-card-hover rounded-lg transition border border-transparent hover:border-brand-border"
           >
             Log In
           </Link>
@@ -96,6 +96,13 @@ export const Navbar: React.FC = () => {
       {isOpen && (
         <div className="md:hidden bg-brand-bg border-t border-brand-border/40 px-6 py-4 flex flex-col space-y-4">
           <a
+            href="#"
+            onClick={(e) => { e.preventDefault(); setIsOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            className="text-brand-text-muted hover:text-brand-primary text-sm font-semibold py-1 transition"
+          >
+            Home
+          </a>
+          <a
             href="#features"
             onClick={(e) => handleNavClick(e, '#features')}
             className="text-brand-text-muted hover:text-brand-primary text-sm font-semibold py-1 transition"
@@ -103,31 +110,24 @@ export const Navbar: React.FC = () => {
             Features
           </a>
           <a
-            href="#roles"
-            onClick={(e) => handleNavClick(e, '#roles')}
+            href="#how-it-works"
+            onClick={(e) => handleNavClick(e, '#how-it-works')}
             className="text-brand-text-muted hover:text-brand-primary text-sm font-semibold py-1 transition"
           >
-            Roles
+            How it works
           </a>
           <a
-            href="#security"
-            onClick={(e) => handleNavClick(e, '#security')}
+            href="#documentation"
+            onClick={(e) => handleNavClick(e, '#documentation')}
             className="text-brand-text-muted hover:text-brand-primary text-sm font-semibold py-1 transition"
           >
-            Security &amp; Integrity
-          </a>
-          <a
-            href="#about-cs"
-            onClick={(e) => handleNavClick(e, '#about-cs')}
-            className="text-brand-text-muted hover:text-brand-primary text-sm font-semibold py-1 transition"
-          >
-            About CS UNN
+            Documentation
           </a>
           <div className="h-px bg-brand-border/40 my-2" />
           <Link
             to="/login"
             onClick={() => setIsOpen(false)}
-            className="text-brand-text-muted hover:text-brand-primary text-sm font-bold py-2 text-center hover:bg-brand-silver/20 rounded-lg transition"
+            className="text-brand-text-muted hover:text-brand-primary text-sm font-bold py-2 text-center hover:bg-brand-card-hover rounded-lg transition"
           >
             Log In
           </Link>

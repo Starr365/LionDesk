@@ -18,6 +18,16 @@ export const validatePassword = (password) => {
   return typeof password === 'string' && password.length >= 6;
 };
 
+export const validateResolutionNotes = (notes) => {
+  if (!notes || typeof notes !== 'string') return false;
+  return notes.trim().length >= 20;
+};
+
+export const validateReopenReason = (reason) => {
+  if (!reason || typeof reason !== 'string') return false;
+  return reason.trim().length >= 10;
+};
+
 /**
  * Valid ticket status transitions.
  * Key = current status, Value = array of allowed next statuses.

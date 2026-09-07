@@ -10,7 +10,7 @@ export const sendPasswordResetEmail = async (email, token) => {
   const from = process.env.EMAIL_FROM || 'onboarding@resend.dev';
   try {
     console.log(`[Email] Dispatching recovery code to ${email}: ${token}`);
-    
+
     const { data, error } = await resend.emails.send({
       from,
       to: email,
