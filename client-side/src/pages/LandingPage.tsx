@@ -5,10 +5,9 @@ import { Navbar } from '../components/landing-page/Navbar';
 import { Hero } from '../components/landing-page/Hero';
 import { Stats } from '../components/landing-page/Stats';
 import { Features } from '../components/landing-page/Features';
-import { Testimonial } from '../components/landing-page/Testimonial';
-import { Security } from '../components/landing-page/Security';
+import { HowItWorks } from '../components/landing-page/HowItWorks';
 import { Roles } from '../components/landing-page/Roles';
-import { Insights } from '../components/landing-page/Insights';
+import { Documentation } from '../components/landing-page/Documentation';
 import { CallToAction } from '../components/landing-page/CallToAction';
 import { Footer } from '../components/landing-page/Footer';
 
@@ -86,10 +85,9 @@ const LandingPage: React.FC = () => {
       <Hero />
       <div className="scroll-section"><Stats /></div>
       <div className="scroll-section"><Features /></div>
-      <div className="scroll-section"><Testimonial /></div>
-      <div className="scroll-section"><Security /></div>
+      <div className="scroll-section"><HowItWorks /></div>
       <div className="scroll-section"><Roles /></div>
-      <div className="scroll-section"><Insights /></div>
+      <div className="scroll-section"><Documentation /></div>
       <div className="scroll-section"><CallToAction /></div>
       <Footer />
     </div>

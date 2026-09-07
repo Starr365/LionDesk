@@ -8,10 +8,10 @@ export const Roles: React.FC = () => {
         {/* Section Header */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <span className="text-xs font-extrabold uppercase tracking-widest text-brand-primary">
-            Role-Based Access Control
+            Dedicated Workspaces
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-brand-text-main leading-none">
-            Dedicated workspaces built for your specific objective.
+            Tailored for Every User
           </h2>
         </div>
 
@@ -22,114 +22,73 @@ export const Roles: React.FC = () => {
             <div className="space-y-6">
               <div className="space-y-2">
                 <span className="text-xs font-extrabold uppercase tracking-wider text-brand-primary">
-                  Identity Verified
+                  Undergraduate & Postgraduate
                 </span>
-                <h3 className="text-2xl font-extrabold text-brand-text-main">STUDENT</h3>
+                <h3 className="text-2xl font-extrabold text-brand-text-main">Student Portal</h3>
               </div>
               <div className="h-px bg-brand-border/30" />
-              <ul className="space-y-4">
-                <li className="flex items-start space-x-3 text-sm text-brand-text-muted font-medium">
-                  <span className="text-brand-primary font-bold text-lg leading-none">&bull;</span>
-                  <span>One-click activation</span>
-                </li>
-                <li className="flex items-start space-x-3 text-sm text-brand-text-muted font-medium">
-                  <span className="text-brand-primary font-bold text-lg leading-none">&bull;</span>
-                  <span>Categorized submission</span>
-                </li>
-                <li className="flex items-start space-x-3 text-sm text-brand-text-muted font-medium">
-                  <span className="text-brand-primary font-bold text-lg leading-none">&bull;</span>
-                  <span>Open/Reopen capability</span>
-                </li>
-                <li className="flex items-start space-x-3 text-sm text-brand-text-muted font-medium">
-                  <span className="text-brand-primary font-bold text-lg leading-none">&bull;</span>
-                  <span>Feedback submission</span>
-                </li>
-              </ul>
+              <p className="text-sm text-brand-text-muted leading-relaxed font-medium">
+                Submit enquiries, attach relevant course documents, receive real-time answers, and track resolution history.
+              </p>
             </div>
             <div className="pt-8">
               <Link
                 to="/activate"
                 className="w-full block text-center bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-sm font-bold py-3.5 rounded-xl transition duration-200 border border-brand-primary shadow-xs"
               >
-                Activate Account
+                Access Student Portal
               </Link>
             </div>
           </div>
 
-          {/* Faculty Staff Card */}
+          {/* Staff Card */}
           <div className="stagger-item bg-brand-card border-2 border-brand-primary/75 p-8 rounded-3xl flex flex-col justify-between relative group shadow-md">
             {/* Featured Badge */}
             <div className="absolute top-0 right-8 -translate-y-1/2 bg-brand-primary text-brand-white text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
-              Departmental Staff
+              Academic & Non-Academic
             </div>
             <div className="space-y-6">
               <div className="space-y-2">
                 <span className="text-xs font-extrabold uppercase tracking-wider text-brand-primary">
-                  Admin Provisioned
+                  Lecturers & Officers
                 </span>
-                <h3 className="text-2xl font-extrabold text-brand-text-main">FACULTY STAFF</h3>
+                <h3 className="text-2xl font-extrabold text-brand-text-main">Staff Workspace</h3>
               </div>
               <div className="h-px bg-brand-border/40" />
-              <ul className="space-y-4">
-                <li className="flex items-start space-x-3 text-sm text-brand-text-muted font-medium">
-                  <span className="text-brand-primary font-bold text-lg leading-none">&bull;</span>
-                  <span>Personal workflow queue</span>
-                </li>
-                <li className="flex items-start space-x-3 text-sm text-brand-text-muted font-medium">
-                  <span className="text-brand-primary font-bold text-lg leading-none">&bull;</span>
-                  <span>Target status tracking</span>
-                </li>
-                <li className="flex items-start space-x-3 text-sm text-brand-text-muted font-medium">
-                  <span className="text-brand-primary font-bold text-lg leading-none">&bull;</span>
-                  <span>In-depth comment logs</span>
-                </li>
-                <li className="flex items-start space-x-3 text-sm text-brand-text-muted font-medium">
-                  <span className="text-brand-primary font-bold text-lg leading-none">&bull;</span>
-                  <span>Direct resolution notes</span>
-                </li>
-              </ul>
+              <p className="text-sm text-brand-text-muted leading-relaxed font-medium">
+                View tickets assigned to your specific courses, provide explanations, post solutions, and mark requests as resolved.
+              </p>
             </div>
             <div className="pt-8">
               <Link
                 to="/login"
                 className="w-full block text-center bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-sm font-bold py-3.5 rounded-xl transition duration-200 shadow-xs"
               >
-                Staff Sign In
+                Access Staff Workspace
               </Link>
             </div>
           </div>
 
-          {/* Administrator (HOD) Card */}
+          {/* Administrator Card */}
           <div className="stagger-item bg-brand-card border border-brand-border/45 p-8 rounded-3xl flex flex-col justify-between hover:border-brand-primary/50 transition duration-300 relative group shadow-sm">
             <div className="space-y-6">
               <div className="space-y-2">
                 <span className="text-xs font-extrabold uppercase tracking-wider text-brand-primary">
-                  Complete Oversight
+                  Head of Dept & Admins
                 </span>
-                <h3 className="text-2xl font-extrabold text-brand-text-main">ADMINISTRATOR (HOD)</h3>
+                <h3 className="text-2xl font-extrabold text-brand-text-main">Admin Console</h3>
               </div>
               <div className="h-px bg-brand-border/30" />
-              <ul className="space-y-4">
-                <li className="flex items-start space-x-3 text-sm text-brand-text-muted font-medium">
-                  <span className="text-brand-primary font-bold text-lg leading-none">&bull;</span>
-                  <span>Track all department tickets instantly</span>
-                </li>
-                <li className="flex items-start space-x-3 text-sm text-brand-text-muted font-medium">
-                  <span className="text-brand-primary font-bold text-lg leading-none">&bull;</span>
-                  <span>Configure escalations</span>
-                </li>
-                <li className="flex items-start space-x-3 text-sm text-brand-text-muted font-medium">
-                  <span className="text-brand-primary font-bold text-lg leading-none">&bull;</span>
-                  <span>Manage user accounts</span>
-                </li>
-              </ul>
+              <p className="text-sm text-brand-text-muted leading-relaxed font-medium">
+                Oversee departmental support volume, reassign overdue tickets, manage categories and staff accounts, and view performance summaries.
+              </p>
             </div>
             <div className="pt-8">
               <Link
                 to="/login"
                 className="w-full block text-center bg-transparent hover:bg-brand-primary text-brand-primary hover:text-brand-white text-sm font-bold py-3.5 rounded-xl transition duration-200 border border-brand-primary shadow-xs"
               >
-                Admin Portal
+                Access Admin Console
               </Link>
             </div>
           </div>

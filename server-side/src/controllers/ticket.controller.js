@@ -1,6 +1,6 @@
 import { pool } from '../config/db.js';
 import generateTicketRef from '../utils/generateTicketRef.js';
-import { validateDescription, isValidTransition } from '../utils/validators.js';
+import { validateDescription, isValidTransition, validateResolutionNotes, validateReopenReason } from '../utils/validators.js';
 import { assignStaffByCategory, incrementWorkload, decrementWorkload } from '../services/routing.service.js';
 import { createNotification } from '../services/notification.service.js';
 import { emitTicketCreated, emitTicketStatusChanged, emitTicketCommented, emitTicketReopened, emitTicketReassigned, emitNotification } from '../services/socket.service.js';
@@ -195,8 +195,8 @@ export const updateTicketStatus = async (req, res) => {
       return res.status(400).json({ error: `Cannot transition from '${ticket.status}' to '${status}'.` });
     }
 
-    if (status === 'resolved' && (!resolution_notes || !resolution_notes.trim())) {
-      return res.status(400).json({ error: 'Resolution notes are mandatory when resolving a ticket.' });
+    if (status === 'resolved' && !validateResolutionNotes(resolution_notes)) {
+      return res.status(400).json({ error: 'Resolution notes are mandatory and must be at least 20 characters.' });
     }
 
     const updates = { status };
@@ -269,8 +269,8 @@ export const reopenTicket = async (req, res) => {
     const { reason } = req.body;
     const ticketId = req.params.id;
 
-    if (!reason || !reason.trim()) {
-      return res.status(400).json({ error: 'A reason is mandatory to reopen a ticket.' });
+    if (!validateReopenReason(reason)) {
+      return res.status(400).json({ error: 'A reopen reason is mandatory and must be at least 10 characters.' });
     }
 
     const [tickets] = await pool.query(`SELECT * FROM tickets WHERE id = ? AND student_id = ?`, [ticketId, req.user.id]);

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
-import heroMockup from '../../assets/hero_dashboard.png';
 
 export const Hero: React.FC = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -16,14 +15,22 @@ export const Hero: React.FC = () => {
         .fromTo('.hero-desc', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.55')
         .fromTo('.hero-actions', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7 }, '-=0.5')
         .fromTo('.hero-mockup',
-          { opacity: 0, scale: 0.92, y: 80, rotateX: 12, transformPerspective: 1000 },
-          { opacity: 1, scale: 1, y: 0, rotateX: 0, duration: 1.3, ease: 'power4.out' },
+          { opacity: 0, scale: 0.94, y: 60 },
+          { opacity: 1, scale: 1, y: 0, duration: 1.1, ease: 'power4.out' },
           '-=0.5'
         );
     }, heroRef);
 
     return () => ctx.revert();
   }, []);
+
+  const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    const element = document.querySelector(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <section ref={heroRef} className="relative overflow-hidden pt-15 pb-20 md:pt-20 md:pb-28">
@@ -37,47 +44,61 @@ export const Hero: React.FC = () => {
         {/* Badge Indicator */}
         <div className="hero-badge inline-flex items-center space-x-2 bg-brand-card border border-brand-border/40 px-3.5 py-1 rounded-full text-xs font-semibold tracking-wide text-brand-text-muted">
           <span className="flex h-2 w-2 rounded-full bg-brand-secondary animate-pulse" />
-          <span>V1.1 Lean Release</span>
+          <span>DEPARTMENT OF COMPUTER SCIENCE, UNN</span>
         </div>
 
         {/* Copy */}
         <div className="max-w-4xl space-y-4 md:space-y-6">
           <h1 className="hero-title text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.08] text-brand-text-main">
-            Modernized support infrastructure <br className="hidden sm:inline" />
-            for <span className="bg-linear-to-r from-brand-secondary via-green-600 to-emerald-600 bg-clip-text text-transparent">the Den.</span>
+            A smarter way to manage <br className="hidden sm:inline" />
+            departmental support.
           </h1>
           <p className="hero-desc text-base sm:text-lg md:text-xl text-brand-text-muted max-w-3xl mx-auto leading-relaxed font-medium">
-            Streamline student complaints, automate ticket routing, and accelerate academic resolutions—all inside a single, role-aware portal built for the Department of Computer Science, UNN.
+            LionDesk is the official online help-desk for the Department of Computer Science, UNN. Students can easily submit academic enquiries, track complaints, and get fast answers from departmental staff and lecturers.
           </p>
         </div>
 
-        {/* Actions */}
+        {/* Actions - No trailing arrows */}
         <div className="hero-actions flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md pt-2">
           <Link
-            to="/activate"
+            to="/login"
             className="w-full sm:w-auto bg-brand-primary hover:bg-brand-primary-hover text-brand-white text-center font-bold px-8 py-3.5 rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 border border-brand-primary"
           >
-            Activate Account
+            Access LionDesk
           </Link>
-          <Link
-            to="/login"
-            className="w-full sm:w-auto text-center font-bold text-brand-text-muted hover:text-brand-primary px-8 py-3.5 hover:bg-brand-silver/20 rounded-xl border border-transparent hover:border-brand-border transition duration-200 flex items-center justify-center gap-1.5"
+          <a
+            href="#how-it-works"
+            onClick={(e) => handleScrollTo(e, '#how-it-works')}
+            className="w-full sm:w-auto text-center font-bold text-brand-text-main hover:text-brand-primary bg-brand-card hover:bg-brand-card-hover px-8 py-3.5 rounded-xl border-2 border-brand-primary/30 hover:border-brand-primary shadow-xs hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
           >
-            <span>Log In</span>
-            <span className="text-brand-secondary font-bold text-lg">&rarr;</span>
-          </Link>
+            Explore the system
+          </a>
         </div>
 
-        {/* Mockup Image */}
+        {/* Realistic Photography Presentation */}
         <div className="hero-mockup w-full max-w-5xl pt-8 md:pt-12">
-          <div className="relative group rounded-2xl overflow-hidden bg-brand-card border border-brand-border/40 p-1.5 sm:p-2.5 shadow-xl">
-            {/* Outer border glow */}
-            <div className="absolute inset-0 bg-linear-to-tr from-brand-primary/5 to-brand-secondary/5 opacity-80 group-hover:opacity-100 transition duration-300 pointer-events-none rounded-2xl" />
-            <img
-              src={heroMockup}
-              alt="LionDesk Dual-Pane Support Mockup Dashboard"
-              className="w-full h-auto rounded-xl object-cover relative z-10 border border-brand-border/20"
-            />
+          <div className="relative group rounded-2xl overflow-hidden bg-brand-card border border-brand-border/40 p-2 sm:p-3 shadow-xl">
+            <div className="relative rounded-xl overflow-hidden aspect-video sm:aspect-21/9 max-h-120">
+              <img
+                src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1600&q=80"
+                alt="University students and faculty collaborating on academic computing and support"
+                className="w-full h-full object-cover object-center transform group-hover:scale-[1.01] transition duration-500"
+              />
+              {/* Overlay gradient */}
+              <div className="absolute inset-0 bg-linear-to-t from-brand-bg/90 via-brand-bg/20 to-transparent" />
+              
+              {/* Floating feature summary chips on image */}
+              <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 flex flex-wrap items-center justify-between gap-3 text-left">
+                <div className="bg-brand-bg/90 backdrop-blur-md border border-brand-border/50 px-4 py-2 rounded-xl shadow-md">
+                  <p className="text-[11px] font-bold text-brand-secondary uppercase tracking-wider">Help-Desk Workspace</p>
+                  <p className="text-xs sm:text-sm font-extrabold text-brand-text-main">Direct connection between students & departmental lecturers</p>
+                </div>
+                <div className="hidden sm:flex items-center space-x-2 bg-brand-card/95 backdrop-blur-md border border-brand-border/50 px-3.5 py-2 rounded-xl shadow-md">
+                  <span className="flex h-2 w-2 rounded-full bg-brand-secondary" />
+                  <span className="text-xs font-bold text-brand-text-main">University of Nigeria, Nsukka</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

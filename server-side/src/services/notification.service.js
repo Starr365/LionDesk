@@ -1,12 +1,12 @@
 import { pool } from '../config/db.js';
-import { sendNotificationEmail } from './email.service.js';
 
 /**
- * Notification service: creates in-app notification records and dispatches Resend emails.
+ * Notification service: creates in-app notification records.
+ * Email dispatch via Resend will be added when the API key is configured.
  */
 
 /**
- * Create an in-app notification for a specific user and attempt Resend email dispatch.
+ * Create an in-app notification for a specific user.
  *
  * @param {object} params
  * @param {number} params.userId - Target user ID.
@@ -21,18 +21,6 @@ export const createNotification = async ({ userId, type, title, message = null, 
      VALUES (?, ?, ?, ?, ?)`,
     [userId, type, title, message, ticketId]
   );
-
-  // Attempt email dispatch via Resend
-  try {
-    const [users] = await pool.query(`SELECT email FROM users WHERE id = ?`, [userId]);
-    if (users.length > 0 && users[0].email) {
-      sendNotificationEmail(users[0].email, title, title, message).catch((err) => {
-        console.error('[Notification Email Error]', err.message);
-      });
-    }
-  } catch (err) {
-    console.error('[Notification Email User Lookup Error]', err.message);
-  }
 
   return { id: result.insertId, userId, type, title, message, ticketId };
 };
