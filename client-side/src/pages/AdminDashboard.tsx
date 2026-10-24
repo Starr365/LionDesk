@@ -255,7 +255,7 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Admin Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         <StatCard
           title="Total Filed complaints"
           value={totalTickets}
@@ -383,7 +383,7 @@ export const AdminDashboard: React.FC = () => {
 
         {/* Tab 3: Categories CRUD Settings */}
         {activeTab === 'categories' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start animate-fade-in">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6 items-start animate-fade-in">
             {/* List */}
             <div className="md:col-span-2 space-y-4">
               <h2 className="text-xl font-extrabold text-brand-text-main font-sans">Active Categories</h2>
@@ -396,7 +396,7 @@ export const AdminDashboard: React.FC = () => {
               ) : (
                 <div className="grid grid-cols-1 gap-4">
                   {categories.map((c) => (
-                    <div key={c.id} className="bg-brand-card border border-brand-border/40 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start gap-3 shadow-xs">
+                    <div key={c.id} className="bg-brand-card border border-brand-border/40 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start gap-3 shadow-xs">
                       <div className="space-y-1 max-w-md">
                         <div className="flex flex-wrap items-center gap-2">
                           <h4 className="text-lg font-bold text-brand-text-main">{c.name}</h4>
@@ -424,7 +424,7 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Create form */}
-            <div className="bg-brand-card border border-brand-border/40 p-6 rounded-2xl space-y-4 shadow-xs">
+            <div className="bg-brand-card border border-brand-border/40 p-4 sm:p-5 rounded-2xl space-y-4 shadow-xs">
               <h3 className="text-lg font-extrabold text-brand-text-main font-sans">Create Category</h3>
               <form onSubmit={handleCreateCategory} className="space-y-4">
                 <div className="space-y-1">
@@ -519,9 +519,9 @@ export const AdminDashboard: React.FC = () => {
             <h2 className="text-xl font-extrabold text-brand-text-main font-sans">Ticketing Metrics &amp; Charts</h2>
 
             {reports ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
                 {/* Category volume */}
-                <div className="bg-brand-card border border-brand-border/40 p-6 rounded-2xl space-y-4 shadow-sm">
+                <div className="bg-brand-card border border-brand-border/40 p-4 sm:p-5 rounded-2xl space-y-4 shadow-sm">
                   <h3 className="text-sm font-bold text-brand-text-main uppercase tracking-wider border-b border-brand-border/30 pb-2">
                     Complaints Volume by Category
                   </h3>
@@ -535,7 +535,7 @@ export const AdminDashboard: React.FC = () => {
                 </div>
 
                 {/* Status Breakdown */}
-                <div className="bg-brand-card border border-brand-border/40 p-6 rounded-2xl space-y-4 shadow-sm">
+                <div className="bg-brand-card border border-brand-border/40 p-4 sm:p-5 rounded-2xl space-y-4 shadow-sm">
                   <h3 className="text-sm font-bold text-brand-text-main uppercase tracking-wider border-b border-brand-border/30 pb-2">
                     System Status breakdown
                   </h3>

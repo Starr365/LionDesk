@@ -222,7 +222,7 @@ export const StudentDashboard: React.FC = () => {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             <StatCard
               title="Open complaints"
               value={activeTickets}
@@ -285,7 +285,7 @@ export const StudentDashboard: React.FC = () => {
 
       {/* Tab 2: File Complaint Inline Panel */}
       {activeTab === 'submit' && (
-        <div className="max-w-2xl bg-brand-card border border-brand-border/40 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-fade-in">
+        <div className="max-w-2xl bg-brand-card border border-brand-border/40 rounded-3xl p-4 sm:p-6 shadow-sm space-y-5 animate-fade-in">
           <div>
             <h2 className="text-xl font-extrabold text-brand-text-main font-sans">File a Departmental Complaint</h2>
             <p className="text-xs text-brand-text-muted font-semibold mt-1">
@@ -390,7 +390,7 @@ export const StudentDashboard: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-brand-card border border-brand-border/40 p-6 sm:p-8 rounded-3xl shadow-sm flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8">
+          <div className="bg-brand-card border border-brand-border/40 p-4 sm:p-6 rounded-3xl shadow-sm flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6">
             <div className="h-24 w-24 rounded-full bg-brand-primary border-2 border-brand-secondary/40 flex items-center justify-center font-bold text-brand-white text-3xl shadow-md shrink-0 uppercase">
               {currentUser.name.slice(0, 2)}
             </div>
@@ -430,8 +430,8 @@ export const StudentDashboard: React.FC = () => {
           </div>
 
           {/* Mini Statistics Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="bg-brand-card border border-brand-border/40 p-5 rounded-2xl shadow-xs flex justify-between items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <div className="bg-brand-card border border-brand-border/40 p-4 sm:p-5 rounded-2xl shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
                 <span className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Active Inquiries</span>
                 <h4 className="text-2xl font-extrabold text-brand-text-main mt-1">{activeTickets}</h4>
@@ -443,7 +443,7 @@ export const StudentDashboard: React.FC = () => {
                 View History
               </button>
             </div>
-            <div className="bg-brand-card border border-brand-border/40 p-5 rounded-2xl shadow-xs flex justify-between items-center">
+            <div className="bg-brand-card border border-brand-border/40 p-4 sm:p-5 rounded-2xl shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
                 <span className="text-xs font-bold text-brand-text-muted uppercase tracking-wider">Total Complaints Filed</span>
                 <h4 className="text-2xl font-extrabold text-brand-text-main mt-1">{totalSubmitted}</h4>

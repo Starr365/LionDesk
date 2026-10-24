@@ -60,7 +60,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text-main flex flex-col font-sans">
       {/* Top Header Bar */}
-      <header className="h-16 bg-brand-card border-b border-brand-border/40 fixed top-0 left-0 w-full z-55 flex items-center justify-between px-6">
+      <header className="h-16 bg-brand-card border-b border-brand-border/40 fixed top-0 left-0 w-full z-55 flex items-center justify-between px-4 sm:px-6">
         <div className="flex items-center space-x-4">
           {/* Mobile hamburger */}
           <button
@@ -176,8 +176,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         </aside>
 
         {/* Right Main Content */}
-        <main className="flex-1 md:pl-64 p-6 sm:p-8 min-h-[calc(100vh-64px)] z-10">
-          <div ref={contentRef} className="max-w-5xl mx-auto space-y-6">
+        <main className="flex-1 p-4 sm:p-6 md:pl-72 md:pr-8 lg:pl-80 lg:pr-10 min-h-[calc(100vh-64px)] z-10">
+          <div ref={contentRef} className="max-w-6xl mx-auto space-y-5 sm:space-y-6">
             {children}
           </div>
         </main>
